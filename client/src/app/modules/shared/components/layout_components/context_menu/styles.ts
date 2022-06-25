@@ -1,6 +1,6 @@
-import styled from "styled-components";
-import { lighten } from "polished";
-import { Button } from "../../button/styles";
+import styled from 'styled-components';
+import { lighten } from 'polished';
+import { Button } from '../../button/styles';
 
 export const Container = styled.div<{ xPos: number; yPos: number }>`
   display: flex;

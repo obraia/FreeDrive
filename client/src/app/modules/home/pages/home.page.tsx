@@ -1,14 +1,16 @@
 import React, { useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { TbFile, TbFolder, TbFolderPlus } from 'react-icons/tb';
-import { useDispatch } from 'react-redux';
-import { showMenu } from '../../../../infrastructure/redux/reducers/context_menu';
+import { RootState } from '../../../../infrastructure/redux/store';
+import { clearAllSelections } from '../reducers/home.reducer';
+import { hideMenu, showMenu } from '../../../../infrastructure/redux/reducers/context_menu';
 import { Selection } from '../../shared/components/layout_components/selection';
 import { Files } from '../components/files/files.component';
 import { Folders } from '../components/folders/folders.component';
-import { clearAllSelections } from '../reducers/home.reducer';
 import { Container } from '../styles/home.style';
 
 const HomePage: React.FC = () => {
+  const { selectedFiles, selectedFolders } = useSelector((state: RootState) => state.home);
   const dispatch = useDispatch();
 
   const inputFile = useRef<HTMLInputElement>(null);
@@ -26,6 +28,7 @@ const HomePage: React.FC = () => {
       icon: TbFile,
       onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.stopPropagation();
+        dispatch(hideMenu());
         handleUpload('Files');
       },
     },
@@ -35,6 +38,7 @@ const HomePage: React.FC = () => {
       icon: TbFolder,
       onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.stopPropagation();
+        dispatch(hideMenu());
         handleUpload('Folders');
       },
     },
@@ -68,22 +72,26 @@ const HomePage: React.FC = () => {
   };
 
   const clearSelection = () => {
-    dispatch(clearAllSelections());
+    if (selectedFiles.length + selectedFolders.length > 0) {
+      dispatch(clearAllSelections());
+    }
   };
 
   useEffect(() => {
     document.title = 'Início - FreeDrive';
 
-    window.addEventListener('click', clearSelection);
+    const home = document.getElementById('home');
+
+    home?.addEventListener('click', clearSelection);
 
     return () => {
-      window.removeEventListener('click', clearSelection);
+      home?.removeEventListener('click', clearSelection);
     };
   });
 
   return (
     <Selection>
-      <Container onContextMenu={handleContextMenu}>
+      <Container onContextMenu={handleContextMenu} id='home'>
         <Folders />
         <Files />
         <input title='files' type='file' id='file' ref={inputFile} />

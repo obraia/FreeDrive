@@ -137,7 +137,7 @@ const Files: React.FC = () => {
       <File
         key={file.id}
         selected={selectedFiles.includes(file.id)}
-        onClick={(e) => handleSelectFile(e, file.id)}
+        onClickCapture={(e) => handleSelectFile(e, file.id)}
         onContextMenu={(e) => handleContextMenu(e, file.id)}
       >
         <Preview src={file.url} />

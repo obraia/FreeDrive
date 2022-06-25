@@ -20,7 +20,7 @@ export const Text = styled.p`
   color: ${({ theme }) => theme.colors.textBackground};
 `;
 
-export const Progress = styled.div<{ progress: number }>`
+export const Progress = styled.div<{ progress: string }>`
   width: 100%;
   height: 10px;
   position: relative;
@@ -32,7 +32,7 @@ export const Progress = styled.div<{ progress: number }>`
     position: absolute;
     top: 0;
     left: 0;
-    width: ${({ progress }) => progress}%;
+    width: ${({ progress }) => progress};
     height: 100%;
     background-color: ${({ theme }) => theme.colors.primary};
     border-radius: ${({ theme }) => theme.metrics.radius};

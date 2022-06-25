@@ -30,7 +30,7 @@ const ContextMenu: React.FC<Props> = (props) => {
 
   const renderItems = () => {
     return props.items.map((i) => (
-      <MenuItem key={i.id} onClick={i.onClick}>
+      <MenuItem key={i.id} onClick={i.onClick} onMouseDown={(e) => e.stopPropagation()}>
         {<i.icon size={20} />}
         {i.name}
       </MenuItem>

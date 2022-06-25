@@ -23,3 +23,10 @@ export const TopbarButton = styled(Button)`
   font-size: 16px;
   color: ${({ theme }) => theme.colors.textBackground};
 `;
+
+export const Separator = styled.div`
+  flex: 1;
+  width: 1px;
+  height: 30px;
+  background-color: ${({ theme }) => theme.colors.background};
+`;

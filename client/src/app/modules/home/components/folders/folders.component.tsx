@@ -1,11 +1,11 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FaFolder } from 'react-icons/fa';
+import { TbArrowUp, TbDownload, TbHeart, TbInfoCircle, TbLink, TbPencil, TbTrash } from 'react-icons/tb';
 import { RootState } from '../../../../../infrastructure/redux/store';
 import { selectFolders } from '../../reducers/home.reducer';
 import { showMenu } from '../../../../../infrastructure/redux/reducers/context_menu';
 import { Body, Container, Folder, Header, SortButton, Title } from './styles';
-import { TbArrowUp, TbDownload, TbHeart, TbInfoCircle, TbLink, TbPencil, TbTrash } from 'react-icons/tb';
 
 const Folders: React.FC = () => {
   const { selectedFolders } = useSelector((state: RootState) => state.home);
@@ -137,7 +137,7 @@ const Folders: React.FC = () => {
       <Folder
         key={folder.id}
         selected={selectedFolders.includes(folder.id)}
-        onClick={(e) => handleSelectFolder(e, folder.id)}
+        onClickCapture={(e) => handleSelectFolder(e, folder.id)}
         onContextMenu={(e) => handleContextMenu(e, folder.id)}
       >
         <FaFolder size={20} color={folder.color} />

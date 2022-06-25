@@ -2,9 +2,10 @@ import React from 'react';
 import { IconType } from 'react-icons';
 import { TbDownload, TbHeart, TbInfoCircle, TbLink, TbPencil, TbTrash } from 'react-icons/tb';
 import { useSelector } from 'react-redux';
+import { BiSelectMultiple } from 'react-icons/bi';
 import { RootState } from '../../../../../infrastructure/redux/store';
 import { Row } from '../layout_components/row';
-import { Container, TopbarButton } from './styles';
+import { Container, Separator, TopbarButton } from './styles';
 
 export interface TopbarItem {
   id: number;
@@ -61,6 +62,22 @@ const Topbar: React.FC = () => {
     },
   ];
 
+  const renderTotalSelected = () => {
+    const total = selectedFiles.length + selectedFolders.length;
+
+    if (total > 0) {
+      return (
+        <>
+          <Separator />
+          <TopbarButton>
+            {selectedFiles.length + selectedFolders.length}
+            <BiSelectMultiple size={18} />
+          </TopbarButton>
+        </>
+      );
+    }
+  };
+
   const renderItems = () => {
     const hasSelectedFiles = Boolean(selectedFiles.length || selectedFolders.length);
 
@@ -80,7 +97,10 @@ const Topbar: React.FC = () => {
   return (
     <Container>
       <TopbarButton>Início</TopbarButton>
-      <Row>{renderItems()}</Row>
+      <Row>
+        {renderItems()}
+        {renderTotalSelected()}
+      </Row>
     </Container>
   );
 };

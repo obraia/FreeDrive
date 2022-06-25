@@ -1,7 +1,6 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { TbHeart, TbHome, TbTrash } from 'react-icons/tb';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../../../infrastructure/redux/store';
+import { useLocation } from 'react-router-dom';
 
 import { Container, MenuItem, MenuItems } from './styles';
 
@@ -10,32 +9,32 @@ export interface Props {
 }
 
 const Menu: React.FC<Props> = (props) => {
-  const { theme } = useSelector((state: RootState) => state.theme);
+  const { pathname } = useLocation();
 
   const items = [
     {
       id: 1,
       name: 'Início',
+      path: '/',
       icon: TbHome,
-      onClick: () => {},
     },
     {
       id: 2,
       name: 'Favoritos',
+      path: '/favorites',
       icon: TbHeart,
-      onClick: () => {},
     },
     {
       id: 3,
       name: 'Lixeira',
+      path: '/trash',
       icon: TbTrash,
-      onClick: () => {},
     },
   ];
 
   function renderItems() {
     return items.map((i) => (
-      <MenuItem key={i.id}>
+      <MenuItem key={i.id} className={pathname === i.path ? 'active' : ''} to={i.path}>
         {<i.icon size={20} />}
         {i.name}
       </MenuItem>

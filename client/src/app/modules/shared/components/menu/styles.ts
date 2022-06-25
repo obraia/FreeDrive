@@ -1,6 +1,6 @@
 import styled from 'styled-components';
-import { lighten } from 'polished';
-import { Button } from '../button/styles';
+import { lighten, transparentize } from 'polished';
+import { Link } from 'react-router-dom';
 
 export const Container = styled.div`
   grid-area: menu;
@@ -22,14 +22,23 @@ export const MenuItems = styled.nav`
   gap: ${({ theme }) => theme.metrics.gap};
 `;
 
-export const MenuItem = styled(Button)`
+export const MenuItem = styled(Link)`
   width: 100%;
   height: 40px;
+  display: flex;
+  align-items: center;
   justify-content: start;
   padding: ${({ theme }) => theme.metrics.padding};
   gap: ${({ theme }) => theme.metrics.gap};
   border-radius: ${({ theme }) => theme.metrics.inner_radius};
   color: ${({ theme }) => theme.colors.textBackground};
   font-size: 13px;
+  text-decoration: none;
   cursor: pointer;
+
+  &.active {
+    color: ${({ theme }) => theme.colors.primary};
+    background-color: ${({ theme }) => transparentize(0.8, theme.colors.primary)};
+    pointer-events: none;
+  }
 `;
