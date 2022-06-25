@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",
+    "allowJs": false,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "outDir": "dist",
+    "lib": [
+      "esnext"
+    ]
+  },
+  "include": [
+    "index.ts",
+    "src/**/*.ts",
+    "src/infrastructure/middlewares/app.ts"
+  ]
+}
