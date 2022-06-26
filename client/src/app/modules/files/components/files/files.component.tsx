@@ -129,9 +129,11 @@ const Files: React.FC<Props> = (props) => {
     return props.files.map((file) => (
       <File
         key={file.id}
+        id={'file_' + file.id}
         selected={selectedFiles.includes(file.id)}
         onClickCapture={(e) => handleSelectFile(e, file)}
         onContextMenu={(e) => handleContextMenu(e, file)}
+        onMouseDownCapture={(e) => e.stopPropagation()}
       >
         <Preview src={file.url} />
         <FileName>{file.name}</FileName>

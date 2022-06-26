@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { TbFile, TbFolder, TbFolderPlus } from 'react-icons/tb';
+import { TbFile, TbFolder, TbFolderPlus, TbInfoCircle } from 'react-icons/tb';
 import { clearAllSelections } from '../reducers/files.reducer';
 import { hideMenu, showMenu } from '../../../../infrastructure/redux/reducers/contextmenu';
-import { Selection } from '../../shared/components/layout_components/selection';
+import { Selection } from '../components/selection';
 import { Files } from '../components/files/files.component';
 import { Folders } from '../components/folders/folders.component';
 import { Container } from '../styles/home.style';
@@ -15,7 +15,6 @@ import foldersMock from '../../../../infrastructure/assets/mocks/folders.json';
 
 const HomePage: React.FC = () => {
   const dispatch = useDispatch();
-
   const inputFile = useRef<HTMLInputElement>(null);
 
   const pageContextMenuItems = [
@@ -43,6 +42,15 @@ const HomePage: React.FC = () => {
         e.stopPropagation();
         dispatch(hideMenu());
         handleUpload('Folders');
+      },
+    },
+    {
+      id: 4,
+      name: 'Obter informações',
+      icon: TbInfoCircle,
+      onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.stopPropagation();
+        dispatch(hideMenu());
       },
     },
   ];
@@ -86,6 +94,7 @@ const HomePage: React.FC = () => {
     return foldersMock.filter((f) => !f.isDeleted);
   };
 
+  //!!! TODO: implementar useMemo
   const renderContent = () => {
     const files = getFiles();
     const folders = getFolders();
@@ -112,19 +121,19 @@ const HomePage: React.FC = () => {
     );
 
     const container = document.getElementById('home-page');
-    container?.addEventListener('click', clearSelection);
+    container?.addEventListener('mousedown', clearSelection);
 
     return () => {
-      container?.removeEventListener('click', clearSelection);
+      container?.removeEventListener('mousedown', clearSelection);
       clearSelection();
     };
   }, []);
 
   return (
     <Selection>
-      <Container onContextMenu={handleContextMenu} id='home-page'>
+      <Container id='home-page' onContextMenu={handleContextMenu}>
         {renderContent()}
-        <input title='files' type='file' id='file' ref={inputFile} />
+        <input title='files' type='file' ref={inputFile} />
       </Container>
     </Selection>
   );

@@ -104,9 +104,11 @@ const Folders: React.FC<Props> = (props) => {
     return props.folders.map((folder) => (
       <Folder
         key={folder.id}
+        id={'folder_' + folder.id}
         selected={selectedFolders.includes(folder.id)}
         onClickCapture={(e) => handleSelectFolder(e, folder.id)}
         onContextMenu={(e) => handleContextMenu(e, folder.id)}
+        onMouseDownCapture={(e) => e.stopPropagation()}
       >
         <FaFolder size={20} color={folder.color || undefined} />
         {folder.name}

@@ -4,13 +4,15 @@ type Modes = 'LOOSE' | 'STRICT';
 
 interface Config {
   container: HTMLElement;
-  items: React.RefObject<HTMLElement>[];
+  files: Element[];
+  folders: Element[];
   selectedClass: string;
   selectionClass: string;
   mode: Modes;
   selection: HTMLElement;
   color: string;
-  onSelectionChange: (selectedItems: HTMLElement[]) => void;
+  onFilesSelectionChange: (ids: number[]) => void;
+  onFoldersSelectionChange: (ids: number[]) => void;
 }
 
 interface Point {
@@ -23,6 +25,7 @@ interface Mouse {
   start: Point;
   isDragging: Boolean;
 }
+
 interface Data {
   left: string;
   top: string;
@@ -30,9 +33,15 @@ interface Data {
   scaleY: number;
 }
 
+export interface Selections {
+  files: number[];
+  folders: number[];
+}
+
 class SelectionController {
   container: HTMLElement;
-  items: React.RefObject<HTMLElement>[];
+  files: Element[];
+  folders: Element[];
   selectedClass: string;
   selectionClass: string;
   mode: Modes;
@@ -40,16 +49,21 @@ class SelectionController {
   color: string;
   mouse: Mouse;
   data: Data;
-  onSelectionChange: (selectedItems: HTMLElement[]) => void;
+  selectedFiles: number[];
+  selectedFolders: number[];
+  onFilesSelectionChange: (ids: number[]) => void;
+  onFoldersSelectionChange: (ids: number[]) => void;
 
   constructor(config: Config) {
     this.container = config.container || document.body;
-    this.items = config.items;
+    this.files = config.files || [];
+    this.folders = config.folders || [];
     this.selectedClass = config.selectedClass;
     this.selectionClass = config.selectionClass;
     this.mode = config.mode;
     this.color = config.color;
-    this.onSelectionChange = config.onSelectionChange;
+    this.onFilesSelectionChange = config.onFilesSelectionChange;
+    this.onFoldersSelectionChange = config.onFoldersSelectionChange;
 
     this.mouse = {
       current: { x: 0, y: 0 },
@@ -64,6 +78,9 @@ class SelectionController {
       scaleY: 0,
     };
 
+    this.selectedFiles = [];
+    this.selectedFolders = [];
+
     this.bindEvents();
   }
 
@@ -77,6 +94,8 @@ class SelectionController {
   unbind() {
     window.removeEventListener('mousemove', this.mouseMove);
     this.resetSelection();
+
+    this.clearSelections();
   }
 
   destroy() {
@@ -94,26 +113,63 @@ class SelectionController {
     return false;
   }
 
-  getSelectedItems() {
+  clearSelections() {
+    this.selectedFiles = [];
+    this.selectedFolders = [];
+  }
+
+  getSelectedItems(): Selections | null {
     const selectionRect = this.selection?.getBoundingClientRect();
 
     if (!selectionRect) {
-      return [];
+      return null;
     }
 
-    return this.items
-      .filter((item) => item.current && this.intersects(selectionRect, item.current.getBoundingClientRect()))
-      .map((item) => item.current) as HTMLElement[];
+    const files = this.files
+      .filter((item) => this.intersects(selectionRect, item.getBoundingClientRect()))
+      .map((item) => parseInt(item.id.split('_')[1]))
+      .sort();
+
+    const folders = this.folders
+      .filter((item) => this.intersects(selectionRect, item.getBoundingClientRect()))
+      .map((item) => parseInt(item.id.split('_')[1]))
+      .sort();
+
+    if (
+      files.length === 0 &&
+      folders.length === 0 &&
+      (this.selectedFiles.length !== 0 || this.selectedFolders.length !== 0)
+    ) {
+      this.clearSelections();
+      return { files: [], folders: [] };
+    }
+
+    if (files.length === 0 && folders.length === 0 && this.files.length !== 0 && this.folders.length !== 0) {
+      return null;
+    }
+
+    if (this.compareArrays(files, this.selectedFiles) && this.compareArrays(folders, this.selectedFolders)) {
+      return null;
+    }
+
+    this.selectedFiles = files;
+    this.selectedFolders = folders;
+
+    return { files, folders };
   }
 
-  updateSelection(selectedItems: Element[]) {
-    this.items.forEach((item) => {
-      if (item.current && selectedItems.indexOf(item.current) === -1) {
-        item.current?.classList.remove(this.selectedClass);
-      } else {
-        item.current?.classList.add(this.selectedClass);
+  compareArrays(a: number[], b: number[]) {
+    if (a.length !== b.length) {
+      return false;
+    }
+
+    for (let i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) {
+        return false;
       }
-    });
+    }
+
+    return true;
   }
 
   resetSelection() {
@@ -172,9 +228,12 @@ class SelectionController {
       this.selection.style.width = width + 'px';
       this.selection.style.height = height + 'px';
 
-      // const selectedItems = this.getSelectedItems();
-      // this.onSelectionChange(selectedItems);
-      // this.updateSelection(selectedItems);
+      const selection = this.getSelectedItems();
+
+      if (selection) {
+        this.onFilesSelectionChange(selection.files);
+        this.onFoldersSelectionChange(selection.folders);
+      }
     }
   }
 
@@ -187,17 +246,17 @@ class SelectionController {
 
     this.mouse.isDragging = false;
 
-    if (this.mouse.start.x === e.clientX && this.mouse.start.y === e.clientY) {
-      if (!(e.target as Element).classList.contains('selected')) {
-        const selectedItems = this.getSelectedItems();
-        this.updateSelection(selectedItems);
-        this.onSelectionChange(selectedItems);
-      } else {
-        const selectedItems = [e.target as HTMLElement];
-        this.updateSelection(selectedItems);
-        this.onSelectionChange(selectedItems);
-      }
-    }
+    // if (this.mouse.start.x === e.clientX && this.mouse.start.y === e.clientY) {
+    //   if (!(e.target as Element).classList.contains('selected')) {
+    //     const selectedItems = this.getSelectedItems();
+    //     this.updateSelection(selectedItems);
+    //     this.onSelectionChange(selectedItems);
+    //   } else {
+    //     const selectedItems = [e.target as HTMLElement];
+    //     this.updateSelection(selectedItems);
+    //     this.onSelectionChange(selectedItems);
+    //   }
+    // }
 
     this.unbind();
   }

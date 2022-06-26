@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../../infrastructure/redux/store';
+import { useDispatch } from 'react-redux';
 import { clearAllSelections } from '../reducers/files.reducer';
-import { Selection } from '../../shared/components/layout_components/selection';
+import { Selection } from '../components/selection';
 import { Files } from '../components/files/files.component';
 import { Folders } from '../components/folders/folders.component';
 import { Container } from '../styles/home.style';
@@ -11,15 +10,50 @@ import { setPage } from '../../../../infrastructure/redux/reducers/pages';
 /** mocks **/
 import filesMock from '../../../../infrastructure/assets/mocks/files.json';
 import foldersMock from '../../../../infrastructure/assets/mocks/folders.json';
+import { hideMenu, showMenu } from '../../../../infrastructure/redux/reducers/contextmenu';
+import { TbInfoCircle, TbTrash } from 'react-icons/tb';
+import { MdRestore } from 'react-icons/md';
 
 const TrashPage: React.FC = () => {
-  const { selectedFiles, selectedFolders } = useSelector((state: RootState) => state.files);
   const dispatch = useDispatch();
 
+  const pageContextMenuItems = [
+    {
+      id: 1,
+      name: 'Esvaziar lixeira',
+      icon: TbTrash,
+      onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.stopPropagation();
+        dispatch(hideMenu());
+      },
+    },
+    {
+      id: 1,
+      name: 'Restaurar tudo',
+      icon: MdRestore,
+      onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.stopPropagation();
+        dispatch(hideMenu());
+      },
+    },
+    {
+      id: 3,
+      name: 'Obter informações',
+      icon: TbInfoCircle,
+      onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.stopPropagation();
+        dispatch(hideMenu());
+      },
+    },
+  ];
+
+  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.preventDefault();
+    dispatch(showMenu({ items: pageContextMenuItems, xPos: e.pageX, yPos: e.pageY }));
+  };
+
   const clearSelection = () => {
-    if (selectedFiles.length + selectedFolders.length > 0) {
-      dispatch(clearAllSelections());
-    }
+    dispatch(clearAllSelections());
   };
 
   const getFiles = () => {
@@ -30,6 +64,7 @@ const TrashPage: React.FC = () => {
     return foldersMock.filter((f) => f.isDeleted);
   };
 
+  //!!! TODO: implementar useMemo
   const renderContent = () => {
     const files = getFiles();
     const folders = getFolders();
@@ -56,17 +91,19 @@ const TrashPage: React.FC = () => {
     );
 
     const container = document.getElementById('trash-page');
-    container?.addEventListener('click', clearSelection);
+    container?.addEventListener('mousedown', clearSelection);
 
     return () => {
-      container?.removeEventListener('click', clearSelection);
+      container?.removeEventListener('mousedown', clearSelection);
       clearSelection();
     };
   }, []);
 
   return (
     <Selection>
-      <Container id='trash-page'>{renderContent()}</Container>
+      <Container onContextMenu={handleContextMenu} id='trash-page'>
+        {renderContent()}
+      </Container>
     </Selection>
   );
 };

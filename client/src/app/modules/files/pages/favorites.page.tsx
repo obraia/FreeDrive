@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { clearAllSelections } from '../reducers/files.reducer';
-import { Selection } from '../../shared/components/layout_components/selection';
+import { Selection } from '../components/selection';
 import { Files } from '../components/files/files.component';
 import { Folders } from '../components/folders/folders.component';
 import { Container } from '../styles/home.style';
@@ -26,6 +26,7 @@ const FavoritesPage: React.FC = () => {
     return foldersMock.filter((f) => !f.isDeleted && f.isFavorite);
   };
 
+  //!!! TODO: implementar useMemo
   const renderContent = () => {
     const files = getFiles();
     const folders = getFolders();
@@ -52,10 +53,10 @@ const FavoritesPage: React.FC = () => {
     );
 
     const container = document.getElementById('favorites-page');
-    container?.addEventListener('click', clearSelection);
+    container?.addEventListener('mousedown', clearSelection);
 
     return () => {
-      container?.removeEventListener('click', clearSelection);
+      container?.removeEventListener('mousedown', clearSelection);
       clearSelection();
     };
   }, []);
