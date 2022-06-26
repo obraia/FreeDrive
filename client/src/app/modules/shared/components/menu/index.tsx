@@ -1,5 +1,6 @@
 import React from 'react';
-import { TbHeart, TbHome, TbTrash } from 'react-icons/tb';
+import { AiOutlineApi } from 'react-icons/ai';
+import { TbApi, TbHeart, TbHome, TbTrash } from 'react-icons/tb';
 import { useLocation } from 'react-router-dom';
 
 import { Container, MenuItem, MenuItems } from './styles';
@@ -26,6 +27,12 @@ const Menu: React.FC<Props> = (props) => {
     },
     {
       id: 3,
+      name: 'API',
+      path: '/api',
+      icon: AiOutlineApi,
+    },
+    {
+      id: 4,
       name: 'Lixeira',
       path: '/trash',
       icon: TbTrash,

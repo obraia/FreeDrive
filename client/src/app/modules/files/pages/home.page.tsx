@@ -1,21 +1,24 @@
 import React, { useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { TbFile, TbFolder, TbFolderPlus } from 'react-icons/tb';
-import { RootState } from '../../../../infrastructure/redux/store';
-import { clearAllSelections } from '../reducers/home.reducer';
-import { hideMenu, showMenu } from '../../../../infrastructure/redux/reducers/context_menu';
+import { clearAllSelections } from '../reducers/files.reducer';
+import { hideMenu, showMenu } from '../../../../infrastructure/redux/reducers/contextmenu';
 import { Selection } from '../../shared/components/layout_components/selection';
 import { Files } from '../components/files/files.component';
 import { Folders } from '../components/folders/folders.component';
 import { Container } from '../styles/home.style';
+import { setPage } from '../../../../infrastructure/redux/reducers/pages';
+
+/** mocks **/
+import filesMock from '../../../../infrastructure/assets/mocks/files.json';
+import foldersMock from '../../../../infrastructure/assets/mocks/folders.json';
 
 const HomePage: React.FC = () => {
-  const { selectedFiles, selectedFolders } = useSelector((state: RootState) => state.home);
   const dispatch = useDispatch();
 
   const inputFile = useRef<HTMLInputElement>(null);
 
-  const contextMenuItems = [
+  const pageContextMenuItems = [
     {
       id: 1,
       name: 'Nova pasta',
@@ -46,7 +49,7 @@ const HomePage: React.FC = () => {
 
   const handleContextMenu = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.preventDefault();
-    dispatch(showMenu({ items: contextMenuItems, xPos: e.pageX, yPos: e.pageY }));
+    dispatch(showMenu({ items: pageContextMenuItems, xPos: e.pageX, yPos: e.pageY }));
   };
 
   const handleUpload = (type: 'Files' | 'Folders') => {
@@ -72,28 +75,55 @@ const HomePage: React.FC = () => {
   };
 
   const clearSelection = () => {
-    if (selectedFiles.length + selectedFolders.length > 0) {
-      dispatch(clearAllSelections());
-    }
+    dispatch(clearAllSelections());
+  };
+
+  const getFiles = () => {
+    return filesMock.filter((f) => !f.isDeleted);
+  };
+
+  const getFolders = () => {
+    return foldersMock.filter((f) => !f.isDeleted);
+  };
+
+  const renderContent = () => {
+    const files = getFiles();
+    const folders = getFolders();
+
+    const hasFiles = files.length > 0;
+    const hasFolders = folders.length > 0;
+
+    return hasFiles || hasFolders ? (
+      <>
+        {hasFolders && <Folders folders={folders} />}
+        {hasFiles && <Files files={files} />}
+      </>
+    ) : (
+      <div />
+    );
   };
 
   useEffect(() => {
-    document.title = 'Início - FreeDrive';
+    dispatch(
+      setPage({
+        title: 'Início - FreeDrive',
+        headerTitle: 'Meu Drive',
+      })
+    );
 
-    const home = document.getElementById('home');
-
-    home?.addEventListener('click', clearSelection);
+    const container = document.getElementById('home-page');
+    container?.addEventListener('click', clearSelection);
 
     return () => {
-      home?.removeEventListener('click', clearSelection);
+      container?.removeEventListener('click', clearSelection);
+      clearSelection();
     };
-  });
+  }, []);
 
   return (
     <Selection>
-      <Container onContextMenu={handleContextMenu} id='home'>
-        <Folders />
-        <Files />
+      <Container onContextMenu={handleContextMenu} id='home-page'>
+        {renderContent()}
         <input title='files' type='file' id='file' ref={inputFile} />
       </Container>
     </Selection>

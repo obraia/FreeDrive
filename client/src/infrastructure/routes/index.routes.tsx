@@ -6,8 +6,8 @@ import { Container } from '../../app/modules/shared/components/layout_components
 import { Header } from '../../app/modules/shared/components/layout_components/header';
 import { Menu } from '../../app/modules/shared/components/menu';
 import { Pages } from '../../app/modules/shared/components/layout_components/pages/styles';
-import { HomeRoutes } from '../../app/modules/home/routes/home.routes';
-import { ContextMenu } from '../../app/modules/shared/components/layout_components/context_menu';
+import { FilesRoutes } from '../../app/modules/files/routes/files.routes';
+import { ContextMenu } from '../../app/modules/shared/components/layout_components/contextmenu';
 import { Topbar } from '../../app/modules/shared/components/topbar';
 import { Storage } from '../../app/modules/shared/components/storage';
 import { Aside } from '../../app/modules/shared/components/layout_components/aside/styles';
@@ -25,7 +25,7 @@ const Routes: React.FC = () => {
         </Aside>
         <Topbar />
         <Pages>
-          <HomeRoutes />
+          <FilesRoutes />
         </Pages>
         <ContextMenu {...menuProps}></ContextMenu>
       </Container>

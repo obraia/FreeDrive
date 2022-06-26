@@ -5,19 +5,21 @@ import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
 import themeReducer from '../reducers/theme';
-import contextMenuReducer from '../reducers/context_menu';
-import homeReducer from '../../../app/modules/home/reducers/home.reducer';
+import pagesReducer from '../reducers/pages';
+import contextMenuReducer from '../reducers/contextmenu';
+import filesReducer from '../../../app/modules/files/reducers/files.reducer';
 
 const reducers = combineReducers({
   theme: themeReducer,
   contextMenu: contextMenuReducer,
-  home: homeReducer,
+  files: filesReducer,
+  pages: pagesReducer,
 });
 
 const persistConfig = {
   key: 'freedrive',
   storage: storage,
-  blacklist: ['contextMenu', 'home'],
+  blacklist: ['contextMenu', 'files', 'pages'],
 };
 
 const persistedReducer = persistReducer(persistConfig, reducers);

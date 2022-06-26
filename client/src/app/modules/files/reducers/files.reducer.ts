@@ -11,7 +11,7 @@ const initialState: HomeState = {
 };
 
 const stock = createSlice({
-  name: 'Home',
+  name: 'Files',
   initialState,
   reducers: {
     selectFiles(state, action: PayloadAction<{ ids: number[] }>) {
@@ -27,8 +27,12 @@ const stock = createSlice({
       state.selectedFolders = [];
     },
     clearAllSelections(state) {
-      state.selectedFolders = [];
-      state.selectedFiles = [];
+      if (state.selectedFiles.length > 0) {
+        state.selectedFiles = [];
+      }
+      if (state.selectedFolders.length > 0) {
+        state.selectedFolders = [];
+      }
     },
   },
 });

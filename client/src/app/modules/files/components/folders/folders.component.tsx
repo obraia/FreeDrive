@@ -3,61 +3,29 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FaFolder } from 'react-icons/fa';
 import { TbArrowUp, TbDownload, TbHeart, TbInfoCircle, TbLink, TbPencil, TbTrash } from 'react-icons/tb';
 import { RootState } from '../../../../../infrastructure/redux/store';
-import { selectFolders } from '../../reducers/home.reducer';
-import { showMenu } from '../../../../../infrastructure/redux/reducers/context_menu';
+import { selectFolders } from '../../reducers/files.reducer';
+import { showMenu } from '../../../../../infrastructure/redux/reducers/contextmenu';
 import { Body, Container, Folder, Header, SortButton, Title } from './styles';
 
-const Folders: React.FC = () => {
-  const { selectedFolders } = useSelector((state: RootState) => state.home);
-  const dispatch = useDispatch();
+export interface FolderData {
+  id: number;
+  name: string;
+  size: number;
+  createdAt: string;
+  modifiedAt: string | null;
+  deletedAt: string | null;
+  color: string | null;
+  isFavorite: boolean;
+  isDeleted: boolean;
+}
 
-  const folders = [
-    {
-      id: 1,
-      name: 'Pasta 1',
-      color: undefined,
-    },
-    {
-      id: 2,
-      name: 'Pasta 2',
-      color: '#56a656',
-    },
-    {
-      id: 3,
-      name: 'Pasta 3',
-      color: '#5b5ba5',
-    },
-    {
-      id: 4,
-      name: 'Pasta 4',
-      color: undefined,
-    },
-    {
-      id: 5,
-      name: 'Pasta 5',
-      color: undefined,
-    },
-    {
-      id: 6,
-      name: 'Pasta 6',
-      color: undefined,
-    },
-    {
-      id: 7,
-      name: 'Pasta 7',
-      color: undefined,
-    },
-    {
-      id: 8,
-      name: 'Pasta 8',
-      color: undefined,
-    },
-    {
-      id: 9,
-      name: 'Pasta 9',
-      color: undefined,
-    },
-  ];
+interface Props {
+  folders: FolderData[];
+}
+
+const Folders: React.FC<Props> = (props) => {
+  const { selectedFolders } = useSelector((state: RootState) => state.files);
+  const dispatch = useDispatch();
 
   const contextMenuItems = [
     {
@@ -124,7 +92,7 @@ const Folders: React.FC = () => {
       const first = Math.min(firstSelected, currentSelected);
       const last = Math.max(firstSelected, currentSelected);
 
-      foldersIds = folders.filter((f) => f.id >= first && f.id <= last).map((f) => f.id);
+      foldersIds = props.folders.filter((f) => f.id >= first && f.id <= last).map((f) => f.id);
     } else {
       foldersIds = [id];
     }
@@ -133,14 +101,14 @@ const Folders: React.FC = () => {
   };
 
   const renderFolders = () => {
-    return folders.map((folder) => (
+    return props.folders.map((folder) => (
       <Folder
         key={folder.id}
         selected={selectedFolders.includes(folder.id)}
         onClickCapture={(e) => handleSelectFolder(e, folder.id)}
         onContextMenu={(e) => handleContextMenu(e, folder.id)}
       >
-        <FaFolder size={20} color={folder.color} />
+        <FaFolder size={20} color={folder.color || undefined} />
         {folder.name}
       </Folder>
     ));

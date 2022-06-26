@@ -1,8 +1,8 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ContextMenuItem } from "../../../app/modules/shared/components/layout_components/context_menu";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ContextMenuItem } from '../../../app/modules/shared/components/layout_components/contextmenu';
 
 const stock = createSlice({
-  name: "context_menu",
+  name: 'contextmenu',
   initialState: {
     isOpen: false,
     xPos: 0,

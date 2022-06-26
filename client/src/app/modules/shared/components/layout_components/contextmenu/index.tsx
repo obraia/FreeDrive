@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { IconType } from 'react-icons';
 import { useDispatch } from 'react-redux';
-import { hideMenu } from '../../../../../../infrastructure/redux/reducers/context_menu';
+import { hideMenu } from '../../../../../../infrastructure/redux/reducers/contextmenu';
 
 import { Container, MenuItem, MenuItems } from './styles';
 

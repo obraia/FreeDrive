@@ -69,14 +69,20 @@ class SelectionController {
 
   bindEvents() {
     this.mouseDown = this.mouseDown.bind(this);
-    this.container.addEventListener('mousedown', this.mouseDown);
     this.mouseUp = this.mouseUp.bind(this);
+    this.container.addEventListener('mousedown', this.mouseDown);
     window.addEventListener('mouseup', this.mouseUp);
   }
 
   unbind() {
     window.removeEventListener('mousemove', this.mouseMove);
     this.resetSelection();
+  }
+
+  destroy() {
+    this.container.removeEventListener('mousedown', this.mouseDown);
+    window.removeEventListener('mousemove', this.mouseMove);
+    window.removeEventListener('mouseup', this.mouseUp);
   }
 
   intersects(a: DOMRect, b: DOMRect) {

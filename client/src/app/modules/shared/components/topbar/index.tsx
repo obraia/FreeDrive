@@ -15,7 +15,8 @@ export interface TopbarItem {
 }
 
 const Topbar: React.FC = () => {
-  const { selectedFiles, selectedFolders } = useSelector((state: RootState) => state.home);
+  const { selectedFiles, selectedFolders } = useSelector((state: RootState) => state.files);
+  const { headerTitle } = useSelector((state: RootState) => state.pages);
 
   const items = [
     {
@@ -96,7 +97,7 @@ const Topbar: React.FC = () => {
 
   return (
     <Container>
-      <TopbarButton>Início</TopbarButton>
+      <TopbarButton>{headerTitle}</TopbarButton>
       <Row>
         {renderItems()}
         {renderTotalSelected()}
