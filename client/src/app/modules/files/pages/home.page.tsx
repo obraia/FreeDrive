@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { TbFile, TbFolder, TbFolderPlus, TbInfoCircle } from 'react-icons/tb';
 import { useParams } from 'react-router-dom';
@@ -12,21 +12,17 @@ import { setPage } from '../../../../infrastructure/redux/reducers/pages';
 import { getSequencePaths } from '../../shared/utils/formatters/paths.formatter';
 import { FilesService } from '../../../../infrastructure/services/files/files.service';
 import { FolderService } from '../../../../infrastructure/services/folders/folders.service';
-import { CurrentFolder, FileChild, FolderChild } from '../../../../infrastructure/services/folders/folders.type';
+import { FileChild, FolderChild } from '../../../../infrastructure/services/folders/folders.type';
 
-interface Props {
-  folder?: boolean;
-}
-
-const HomePage: React.FC<Props> = (props) => {
+const HomePage: React.FC = () => {
   const [files, setFiles] = useState<FileChild[]>([]);
   const [folders, setFolders] = useState<FolderChild[]>([]);
 
   const dispatch = useDispatch();
   const inputFile = useRef<HTMLInputElement>(null);
-  const [Content, setContent] = useState<ReactNode>(null);
 
-  const { id } = useParams();
+  const { id: folderId = '62ba0256ca20daae241e8739' } = useParams();
+  const userId = '62ba0237ca20daae241e8737';
 
   const filesService = new FilesService();
   const foldersService = new FolderService();
@@ -75,7 +71,7 @@ const HomePage: React.FC<Props> = (props) => {
   };
 
   const handleUpload = (type: 'Files' | 'Folders') => {
-    if (!inputFile.current || !id) return;
+    if (!inputFile.current) return;
 
     if (type === 'Files') {
       inputFile.current.setAttribute('name', 'file[]');
@@ -99,12 +95,12 @@ const HomePage: React.FC<Props> = (props) => {
   const handleFileChange = (e: Event) => {
     const files = (e.target as HTMLInputElement).files;
 
-    if (!files || !id) return;
+    if (!files) return;
 
     const formData = new FormData();
 
-    formData.append('userId', '62ba0237ca20daae241e8737');
-    formData.append('parentId', id);
+    formData.append('userId', userId);
+    formData.append('parentId', folderId);
 
     for (let i = 0; i < files.length; i++) {
       formData.append('files', files[i]);
@@ -135,9 +131,9 @@ const HomePage: React.FC<Props> = (props) => {
   };
 
   useEffect(() => {
-    const initialId = id || '62ba0256ca20daae241e8739';
+    const uploader = inputFile.current;
 
-    foldersService.getFolderById(initialId).then((folder) => {
+    foldersService.getFolderById(folderId).then((folder) => {
       dispatch(
         setPage({
           title: (folder?.folderName || 'Início') + ' - FreeDrive',
@@ -151,14 +147,14 @@ const HomePage: React.FC<Props> = (props) => {
 
     const container = document.getElementById('home-page');
     container?.addEventListener('mousedown', clearSelection);
-    inputFile.current?.addEventListener('change', handleFileChange);
+    uploader?.addEventListener('change', handleFileChange);
 
     return () => {
       container?.removeEventListener('mousedown', clearSelection);
-      inputFile.current?.removeEventListener('change', handleFileChange);
+      uploader?.removeEventListener('change', handleFileChange);
       clearSelection();
     };
-  }, [id]);
+  }, [folderId]);
 
   return (
     <Selection>

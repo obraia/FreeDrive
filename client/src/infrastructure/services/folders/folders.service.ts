@@ -17,7 +17,7 @@ class FolderService {
   private url: string;
 
   constructor() {
-    this.url = 'http://localhost:3003/api/folders'; // String(process.env.REACT_APP_API_ENDPOINT);
+    this.url = 'http://localhost:3003/api';
 
     this.api = axios.create({
       baseURL: this.url,
@@ -30,7 +30,7 @@ class FolderService {
   public getFolders(params: Params): Promise<GetFoldersResponse[]> {
     return new Promise((resolve, reject) => {
       this.api
-        .get(`/`, { params })
+        .get(`/folders`, { params })
         .then((response) => {
           resolve(response.data);
         })
@@ -43,7 +43,7 @@ class FolderService {
   public async getFolderById(id: string): Promise<CurrentFolder> {
     return new Promise((resolve, reject) => {
       this.api
-        .get(`/${id}`)
+        .get(`/folders/${id}`)
         .then((response) => {
           resolve(response.data);
         })

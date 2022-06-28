@@ -18,7 +18,7 @@ class FilesService {
   private url: string;
 
   constructor() {
-    this.url = 'http://localhost:3003/api/files'; // String(process.env.REACT_APP_API_ENDPOINT);
+    this.url = 'http://localhost:3003/api';
 
     this.api = axios.create({
       baseURL: this.url,
@@ -31,7 +31,7 @@ class FilesService {
   public async getFiles(params: Params): Promise<GetFilesResponse[]> {
     return new Promise((resolve, reject) => {
       this.api
-        .get(`/`, { params })
+        .get(`/files`, { params })
         .then((response) => {
           resolve(response.data);
         })
@@ -44,7 +44,7 @@ class FilesService {
   public async getFile(path: string): Promise<GetFilesResponse> {
     return new Promise((resolve, reject) => {
       this.api
-        .get(`/${path}`)
+        .get(`/files/${path}`)
         .then((response) => {
           resolve(response.data);
         })
@@ -57,20 +57,7 @@ class FilesService {
   public async uploadFiles(formData: FormData): Promise<FileChild[]> {
     return new Promise((resolve, reject) => {
       this.api
-        .post(`/`, formData)
-        .then((response) => {
-          resolve(response.data);
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
-  }
-
-  public async getDiskSpace(): Promise<Disk> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .get(`/disk`)
+        .post(`/files/`, formData)
         .then((response) => {
           resolve(response.data);
         })

@@ -2,7 +2,7 @@ import checkdisk from 'check-disk-space';
 
 class FsHelper {
   static async getDiskSpace() {
-    const baseDir = String(process.env.BASE_DIR);
+    const baseDir = String(process.env.STATIC_DIR);
     const disk = await checkdisk(baseDir);
 
     return {
