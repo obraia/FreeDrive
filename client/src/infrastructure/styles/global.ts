@@ -21,11 +21,6 @@ const GlobalStyle = createGlobalStyle`
     display: flex;
     flex-direction: column;
     background-color: ${({ theme }) => theme.colors.background};
-
-    @media (max-width: ${({ theme }) => theme.metrics.desktop_small}) {
-      height: auto;
-      min-height: 100vh;
-    }
   }
 
   button {

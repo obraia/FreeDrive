@@ -87,11 +87,11 @@ const ApiPage: React.FC = () => {
   };
 
   const getFiles = () => {
-    return filesMock;
+    return filesMock.filter((f) => !f.isDeleted);
   };
 
   const getFolders = () => {
-    return foldersMock;
+    return foldersMock.filter((f) => !f.isDeleted);
   };
 
   //!!! TODO: implementar useMemo
@@ -104,8 +104,8 @@ const ApiPage: React.FC = () => {
 
     return hasFiles || hasFolders ? (
       <>
-        {hasFolders && <Folders folders={folders} />}
-        {hasFiles && <Files files={files} />}
+        {hasFolders && <Folders folders={folders as any} />}
+        {hasFiles && <Files files={files as any} />}
       </>
     ) : (
       <div />
@@ -116,7 +116,7 @@ const ApiPage: React.FC = () => {
     dispatch(
       setPage({
         title: 'API - FreeDrive',
-        headerTitle: 'API',
+        pathSequence: [],
       })
     );
 

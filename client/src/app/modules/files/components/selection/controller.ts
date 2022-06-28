@@ -6,13 +6,11 @@ interface Config {
   container: HTMLElement;
   files: Element[];
   folders: Element[];
-  selectedClass: string;
-  selectionClass: string;
   mode: Modes;
-  selection: HTMLElement;
   color: string;
-  onFilesSelectionChange: (ids: number[]) => void;
-  onFoldersSelectionChange: (ids: number[]) => void;
+  onFilesSelectionChange: (ids: string[]) => void;
+  onFoldersSelectionChange: (ids: string[]) => void;
+  onSelectionEnd?: () => void;
 }
 
 interface Point {
@@ -23,7 +21,6 @@ interface Point {
 interface Mouse {
   current: Point;
   start: Point;
-  isDragging: Boolean;
 }
 
 interface Data {
@@ -34,41 +31,39 @@ interface Data {
 }
 
 export interface Selections {
-  files: number[];
-  folders: number[];
+  files: string[];
+  folders: string[];
 }
 
 class SelectionController {
   container: HTMLElement;
   files: Element[];
   folders: Element[];
-  selectedClass: string;
-  selectionClass: string;
   mode: Modes;
-  selection?: HTMLElement | null;
   color: string;
   mouse: Mouse;
   data: Data;
-  selectedFiles: number[];
-  selectedFolders: number[];
-  onFilesSelectionChange: (ids: number[]) => void;
-  onFoldersSelectionChange: (ids: number[]) => void;
+  selectedFiles: string[];
+  selectedFolders: string[];
+  onFilesSelectionChange: (ids: string[]) => void;
+  onFoldersSelectionChange: (ids: string[]) => void;
+  onSelectionEnd?: () => void;
+
+  static selection?: HTMLElement | null;
 
   constructor(config: Config) {
     this.container = config.container || document.body;
     this.files = config.files || [];
     this.folders = config.folders || [];
-    this.selectedClass = config.selectedClass;
-    this.selectionClass = config.selectionClass;
     this.mode = config.mode;
     this.color = config.color;
     this.onFilesSelectionChange = config.onFilesSelectionChange;
     this.onFoldersSelectionChange = config.onFoldersSelectionChange;
+    this.onSelectionEnd = config.onSelectionEnd;
 
     this.mouse = {
       current: { x: 0, y: 0 },
       start: { x: 0, y: 0 },
-      isDragging: false,
     };
 
     this.data = {
@@ -94,7 +89,6 @@ class SelectionController {
   unbind() {
     window.removeEventListener('mousemove', this.mouseMove);
     this.resetSelection();
-
     this.clearSelections();
   }
 
@@ -119,7 +113,7 @@ class SelectionController {
   }
 
   getSelectedItems(): Selections | null {
-    const selectionRect = this.selection?.getBoundingClientRect();
+    const selectionRect = SelectionController.selection?.getBoundingClientRect();
 
     if (!selectionRect) {
       return null;
@@ -127,12 +121,12 @@ class SelectionController {
 
     const files = this.files
       .filter((item) => this.intersects(selectionRect, item.getBoundingClientRect()))
-      .map((item) => parseInt(item.id.split('_')[1]))
+      .map((item) => item.id.split('_')[1])
       .sort();
 
     const folders = this.folders
       .filter((item) => this.intersects(selectionRect, item.getBoundingClientRect()))
-      .map((item) => parseInt(item.id.split('_')[1]))
+      .map((item) => item.id.split('_')[1])
       .sort();
 
     if (
@@ -158,7 +152,7 @@ class SelectionController {
     return { files, folders };
   }
 
-  compareArrays(a: number[], b: number[]) {
+  compareArrays(a: string[], b: string[]) {
     if (a.length !== b.length) {
       return false;
     }
@@ -173,23 +167,23 @@ class SelectionController {
   }
 
   resetSelection() {
-    if (this.selection) {
-      this.selection.remove();
-      this.selection = null;
+    if (SelectionController.selection) {
+      SelectionController.selection.remove();
+      SelectionController.selection = null;
     }
   }
 
-  createSelectionBox(parent: any) {
-    this.selection = document.createElement('div');
-    this.selection.style.position = 'absolute';
-    this.selection.style.width = '0px';
-    this.selection.style.height = '0px';
-    this.selection.style.top = '0';
-    this.selection.style.left = '0';
-    this.selection.style.pointerEvents = 'none';
-    this.selection.style.backgroundColor = transparentize(0.75, this.color);
-    this.selection.style.border = `1px solid ${this.color}`;
-    document.body.appendChild(this.selection);
+  createSelectionBox() {
+    SelectionController.selection = document.createElement('div');
+    SelectionController.selection.style.position = 'absolute';
+    SelectionController.selection.style.width = '0px';
+    SelectionController.selection.style.height = '0px';
+    SelectionController.selection.style.top = '0';
+    SelectionController.selection.style.left = '0';
+    SelectionController.selection.style.pointerEvents = 'none';
+    SelectionController.selection.style.backgroundColor = transparentize(0.75, this.color);
+    SelectionController.selection.style.border = `1px solid ${this.color}`;
+    document.body.appendChild(SelectionController.selection);
   }
 
   mouseDown(e: any) {
@@ -204,15 +198,14 @@ class SelectionController {
 
     this.mouse.start.x = e.clientX;
     this.mouse.start.y = e.clientY;
-    this.mouse.isDragging = true;
-    this.createSelectionBox(e.target);
+    this.createSelectionBox();
   }
 
   mouseMove(e: MouseEvent) {
     this.mouse.current.x = e.clientX;
     this.mouse.current.y = e.clientY;
 
-    if (this.selection) {
+    if (SelectionController.selection) {
       const invertX = this.mouse.start.x > this.mouse.current.x;
       const invertY = this.mouse.start.y > this.mouse.current.y;
       const width = Math.abs(this.mouse.start.x - this.mouse.current.x);
@@ -223,10 +216,10 @@ class SelectionController {
       this.data.scaleX = width / window.innerWidth;
       this.data.scaleY = height / window.innerHeight;
 
-      this.selection.style.left = this.data.left;
-      this.selection.style.top = this.data.top;
-      this.selection.style.width = width + 'px';
-      this.selection.style.height = height + 'px';
+      SelectionController.selection.style.left = this.data.left;
+      SelectionController.selection.style.top = this.data.top;
+      SelectionController.selection.style.width = width + 'px';
+      SelectionController.selection.style.height = height + 'px';
 
       const selection = this.getSelectedItems();
 
@@ -239,26 +232,11 @@ class SelectionController {
 
   mouseUp(e: MouseEvent) {
     e.stopImmediatePropagation();
-
-    if (e.buttons !== 1) {
-      return this.unbind();
-    }
-
-    this.mouse.isDragging = false;
-
-    // if (this.mouse.start.x === e.clientX && this.mouse.start.y === e.clientY) {
-    //   if (!(e.target as Element).classList.contains('selected')) {
-    //     const selectedItems = this.getSelectedItems();
-    //     this.updateSelection(selectedItems);
-    //     this.onSelectionChange(selectedItems);
-    //   } else {
-    //     const selectedItems = [e.target as HTMLElement];
-    //     this.updateSelection(selectedItems);
-    //     this.onSelectionChange(selectedItems);
-    //   }
-    // }
-
     this.unbind();
+
+    if (this.onSelectionEnd) {
+      this.onSelectionEnd();
+    }
   }
 }
 

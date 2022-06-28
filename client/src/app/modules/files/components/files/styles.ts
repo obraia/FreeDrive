@@ -33,7 +33,7 @@ export const SortButton = styled(Button)`
 export const Body = styled.div`
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: ${({ theme }) => theme.metrics.gap};
   padding: ${({ theme }) => theme.metrics.padding};
 `;
@@ -50,6 +50,7 @@ export const File = styled.div<{ selected?: Boolean }>`
   border-radius: ${({ theme }) => theme.metrics.radius};
   background-color: ${({ theme }) => lighten(0.08, theme.colors.background)};
   color: ${({ theme }) => theme.colors.textBackground};
+  text-align: center;
   transition: background-color 0.2s;
 
   &:hover {

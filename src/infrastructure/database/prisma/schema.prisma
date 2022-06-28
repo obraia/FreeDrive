@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DB_URL")
+}
+
+model User {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  username  String    @unique
+  email     String    @unique
+  password  String
+  deleted   Boolean?  @default(false)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime?
+  deletedAt DateTime?
+  files     File[]
+  folders   Folder[]
+
+  @@map("users")
+}
+
+model File {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String    @db.ObjectId
+  parentId     String    @db.ObjectId
+  fileName     String
+  originalName String
+  size         Int
+  mimetype     String
+  path         String
+  favorite     Boolean?  @default(false)
+  deleted      Boolean?  @default(false)
+  createdAt    DateTime? @default(now())
+  updatedAt    DateTime?
+  deletedAt    DateTime?
+  createdBy    User      @relation(fields: [userId], references: [id])
+  parent       Folder    @relation(fields: [parentId], references: [id])
+
+  @@map("files")
+}
+
+model Folder {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String    @db.ObjectId
+  parentId   String?   @db.ObjectId
+  folderName String
+  color      String?
+  favorite   Boolean?  @default(false)
+  deleted    Boolean?  @default(false)
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime?
+  deletedAt  DateTime?
+  files      File[]
+  createdBy  User      @relation(fields: [userId], references: [id])
+  parent     Folder?   @relation("ParentChildren", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children   Folder[]  @relation("ParentChildren")
+
+  @@map("folders")
+}

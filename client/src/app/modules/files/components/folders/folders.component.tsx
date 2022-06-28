@@ -1,120 +1,169 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FaFolder } from 'react-icons/fa';
-import { TbArrowUp, TbDownload, TbHeart, TbInfoCircle, TbLink, TbPencil, TbTrash } from 'react-icons/tb';
+import { TbArrowUp, TbDownload, TbHeart, TbHeartBroken, TbInfoCircle, TbLink, TbPencil, TbTrash } from 'react-icons/tb';
 import { RootState } from '../../../../../infrastructure/redux/store';
-import { selectFolders } from '../../reducers/files.reducer';
+import { selectFolders, setContextMenuItems } from '../../reducers/files.reducer';
 import { showMenu } from '../../../../../infrastructure/redux/reducers/contextmenu';
 import { Body, Container, Folder, Header, SortButton, Title } from './styles';
-
-export interface FolderData {
-  id: number;
-  name: string;
-  size: number;
-  createdAt: string;
-  modifiedAt: string | null;
-  deletedAt: string | null;
-  color: string | null;
-  isFavorite: boolean;
-  isDeleted: boolean;
-}
+import { MdRestore } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
+import { FolderChild } from '../../../../../infrastructure/services/folders/folders.type';
 
 interface Props {
-  folders: FolderData[];
+  folders: FolderChild[];
 }
 
 const Folders: React.FC<Props> = (props) => {
   const { selectedFolders } = useSelector((state: RootState) => state.files);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const contextMenuItems = [
+  const regularContextMenuItems = (folder: FolderChild) => [
     {
       id: 1,
       name: 'Copiar link',
       icon: TbLink,
+      single: true,
       onClick: () => {},
     },
     {
       id: 2,
       name: 'Renomear',
       icon: TbPencil,
+      single: true,
       onClick: () => {},
     },
     {
       id: 3,
-      name: 'Favoritar',
-      icon: TbHeart,
+      name: folder.favorite ? 'Desfavoritar' : 'Favoritar',
+      icon: folder.favorite ? TbHeartBroken : TbHeart,
+      single: false,
       onClick: () => {},
     },
     {
       id: 4,
       name: 'Fazer download',
       icon: TbDownload,
+      single: false,
       onClick: () => {},
     },
     {
       id: 5,
       name: 'Excluir',
       icon: TbTrash,
+      single: false,
       onClick: () => {},
     },
     {
       id: 6,
       name: 'Informações',
       icon: TbInfoCircle,
+      single: true,
       onClick: () => {},
     },
   ];
 
-  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, id: number) => {
+  const deletedContextMenuItems = () => [
+    {
+      id: 1,
+      name: 'Restaurar',
+      icon: MdRestore,
+      single: false,
+      onClick: () => {},
+    },
+    {
+      id: 2,
+      name: 'Excluir permanentemente',
+      icon: TbTrash,
+      single: false,
+      onClick: () => {},
+    },
+    {
+      id: 3,
+      name: 'Informações',
+      icon: TbInfoCircle,
+      single: true,
+      onClick: () => {},
+    },
+  ];
+
+  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, index: number) => {
     e.stopPropagation();
     e.preventDefault();
 
-    handleSelectFolder(e, id);
+    handleSelectFolder(e, index);
 
-    dispatch(showMenu({ items: contextMenuItems, xPos: e.pageX, yPos: e.pageY }));
+    const folder = props.folders[index];
+
+    const contextItems = folder.deleted ? deletedContextMenuItems() : regularContextMenuItems(folder);
+
+    dispatch(showMenu({ items: contextItems, xPos: e.pageX, yPos: e.pageY }));
   };
 
-  const handleSelectFolder = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, id: number) => {
+  const handleSelectFolder = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, index: number) => {
     e.stopPropagation();
 
-    let foldersIds = [];
+    const folder = props.folders[index];
+
+    if (e.buttons === 2 && selectedFolders.length >= 1 && selectedFolders.includes(folder.id)) {
+      return;
+    }
+
+    let foldersIds = [] as string[];
 
     if (e.metaKey && selectedFolders.length > 0) {
-      if (selectedFolders.includes(id)) {
-        foldersIds = selectedFolders.filter((i) => i !== id);
+      if (selectedFolders.includes(folder.id)) {
+        foldersIds = selectedFolders.filter((i) => i !== folder.id);
       } else {
-        foldersIds = [...selectedFolders, id];
+        foldersIds = [...selectedFolders, folder.id];
       }
     } else if (e.shiftKey && selectedFolders.length > 0) {
       const firstSelected = selectedFolders[0];
-      const currentSelected = id;
-      const first = Math.min(firstSelected, currentSelected);
-      const last = Math.max(firstSelected, currentSelected);
+      const firstIndex = props.folders.findIndex((f) => f.id === firstSelected);
+      const first = Math.min(firstIndex, index);
+      const last = Math.max(firstIndex, index);
 
-      foldersIds = props.folders.filter((f) => f.id >= first && f.id <= last).map((f) => f.id);
+      foldersIds = props.folders.filter((f, i) => i >= first && i <= last).map((f) => f.id);
     } else {
-      foldersIds = [id];
+      foldersIds = [folder.id];
     }
 
     dispatch(selectFolders({ ids: foldersIds }));
   };
 
+  const goToFolder = (folder: FolderChild) => {
+    navigate(folder.id);
+  };
+
   const renderFolders = () => {
-    return props.folders.map((folder) => (
+    return props.folders.map((folder, index) => (
       <Folder
         key={folder.id}
         id={'folder_' + folder.id}
         selected={selectedFolders.includes(folder.id)}
-        onClickCapture={(e) => handleSelectFolder(e, folder.id)}
-        onContextMenu={(e) => handleContextMenu(e, folder.id)}
+        onClickCapture={(e) => handleSelectFolder(e, index)}
+        onContextMenu={(e) => handleContextMenu(e, index)}
         onMouseDownCapture={(e) => e.stopPropagation()}
+        onDoubleClick={() => goToFolder(folder)}
       >
         <FaFolder size={20} color={folder.color || undefined} />
-        {folder.name}
+        {folder.folderName}
       </Folder>
     ));
   };
+
+  useEffect(() => {
+    if (selectedFolders.length > 0) {
+      const folder = props.folders.find((f) => f.id === selectedFolders[0]);
+
+      if (folder) {
+        const contextItems = folder.deleted ? deletedContextMenuItems() : regularContextMenuItems(folder);
+
+        dispatch(setContextMenuItems({ items: contextItems }));
+      }
+    }
+  }, [selectedFolders]);
 
   return (
     <Container>

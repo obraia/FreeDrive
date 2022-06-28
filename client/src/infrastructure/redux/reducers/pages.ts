@@ -1,21 +1,22 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { PathSequence } from '../../../app/modules/shared/utils/formatters/paths.formatter';
 
 const stock = createSlice({
   name: 'pages',
   initialState: {
     title: 'FreeDrive',
-    headerTitle: 'Início',
+    pathSequence: [] as PathSequence[],
   },
   reducers: {
     setPage(
       state,
       action: PayloadAction<{
         title: string;
-        headerTitle: string;
+        pathSequence: PathSequence[];
       }>
     ) {
       state.title = action.payload.title;
-      state.headerTitle = action.payload.headerTitle;
+      state.pathSequence = action.payload.pathSequence;
 
       document.title = action.payload.title;
     },

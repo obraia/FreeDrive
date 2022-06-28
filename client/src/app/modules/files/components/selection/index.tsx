@@ -16,11 +16,11 @@ const Selection: React.FC<Props> = (props) => {
   const ref = useRef(null);
   const childrenRef = React.cloneElement(props.children as any, { ref });
 
-  const handleSelectFiles = (ids: number[]) => {
+  const handleSelectFiles = (ids: string[]) => {
     dispatch(selectFiles({ ids }));
   };
 
-  const handleSelectFolders = (ids: number[]) => {
+  const handleSelectFolders = (ids: string[]) => {
     dispatch(selectFolders({ ids }));
   };
 
@@ -33,12 +33,9 @@ const Selection: React.FC<Props> = (props) => {
       files: files,
       folders: folders,
       mode: 'LOOSE',
+      color: theme.colors.primary,
       onFilesSelectionChange: handleSelectFiles,
       onFoldersSelectionChange: handleSelectFolders,
-      selectedClass: 'selected',
-      selection: {} as any,
-      selectionClass: 'selection',
-      color: theme.colors.primary,
     });
 
     return () => {

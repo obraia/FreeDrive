@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { clearAllSelections } from '../reducers/files.reducer';
 import { Selection } from '../components/selection';
@@ -10,47 +10,67 @@ import { setPage } from '../../../../infrastructure/redux/reducers/pages';
 /** mocks **/
 import filesMock from '../../../../infrastructure/assets/mocks/files.json';
 import foldersMock from '../../../../infrastructure/assets/mocks/folders.json';
+import { FilesService } from '../../../../infrastructure/services/files/files.service';
+import { getSequencePaths } from '../../shared/utils/formatters/paths.formatter';
+import { useLocation, useParams } from 'react-router-dom';
+import { FolderService } from '../../../../infrastructure/services/folders/folders.service';
 
 const FavoritesPage: React.FC = () => {
+  const [Content, setContent] = useState<ReactNode>(null);
   const dispatch = useDispatch();
+  const pathname = useParams()['*'] || '';
+
+  const filesService = new FilesService();
+  const folderService = new FolderService();
 
   const clearSelection = () => {
     dispatch(clearAllSelections());
   };
 
-  const getFiles = () => {
-    return filesMock.filter((f) => !f.isDeleted && f.isFavorite);
+  const getCurrentFolder = async (path: string) => {
+    return await folderService.getFolderById(path);
   };
 
-  const getFolders = () => {
-    return foldersMock.filter((f) => !f.isDeleted && f.isFavorite);
+  const getFiles = async (parentId: string) => {
+    return await filesService.getFiles({ parentId });
+  };
+
+  const getFolders = async (parentId: string) => {
+    return await folderService.getFolders({ parentId });
   };
 
   //!!! TODO: implementar useMemo
-  const renderContent = () => {
-    const files = getFiles();
-    const folders = getFolders();
+  const renderContent = async (path: string) => {
+    const files = await getFiles(path);
+    const folders = await getFolders(path);
 
     const hasFiles = files.length > 0;
     const hasFolders = folders.length > 0;
 
-    return hasFiles || hasFolders ? (
-      <>
-        {hasFolders && <Folders folders={folders} />}
-        {hasFiles && <Files files={files} />}
-      </>
-    ) : (
-      <div />
-    );
+    const content =
+      hasFiles || hasFolders ? (
+        <>
+          {hasFolders && <Folders folders={folders} />}
+          {hasFiles && <Files files={files} />}
+        </>
+      ) : (
+        <div />
+      );
+
+    setContent(content);
   };
 
   useEffect(() => {
-    dispatch(
-      setPage({
-        title: 'Favoritos - FreeDrive',
-        headerTitle: 'Favoritos',
-      })
-    );
+    getCurrentFolder(pathname).then((folder) => {
+      dispatch(
+        setPage({
+          title: (folder?.folderName || 'Favoritos') + ' - FreeDrive',
+          pathSequence: getSequencePaths(folder),
+        })
+      );
+    });
+
+    renderContent(pathname);
 
     const container = document.getElementById('favorites-page');
     container?.addEventListener('mousedown', clearSelection);
@@ -59,11 +79,11 @@ const FavoritesPage: React.FC = () => {
       container?.removeEventListener('mousedown', clearSelection);
       clearSelection();
     };
-  }, []);
+  }, [pathname]);
 
   return (
     <Selection>
-      <Container id='favorites-page'>{renderContent()}</Container>
+      <Container id='favorites-page'>{Content}</Container>
     </Selection>
   );
 };

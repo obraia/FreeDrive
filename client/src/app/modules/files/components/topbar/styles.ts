@@ -1,6 +1,7 @@
 import { lighten } from 'polished';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { Button } from '../button/styles';
+import { Button } from '../../../shared/components/button/styles';
 
 export const Container = styled.div`
   grid-area: topbar;
@@ -13,7 +14,7 @@ export const Container = styled.div`
   gap: ${({ theme }) => theme.metrics.gap};
   border-radius: ${({ theme }) => theme.metrics.radius};
   background-color: ${({ theme }) => lighten(0.08, theme.colors.background)};
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.textBackground};
 `;
 
 export const TopbarButton = styled(Button)`

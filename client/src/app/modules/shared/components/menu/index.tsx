@@ -16,7 +16,7 @@ const Menu: React.FC<Props> = (props) => {
     {
       id: 1,
       name: 'Início',
-      path: '/',
+      path: '/drive',
       icon: TbHome,
     },
     {

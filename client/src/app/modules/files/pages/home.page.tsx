@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { TbFile, TbFolder, TbFolderPlus, TbInfoCircle } from 'react-icons/tb';
+import { useParams } from 'react-router-dom';
 import { clearAllSelections } from '../reducers/files.reducer';
 import { hideMenu, showMenu } from '../../../../infrastructure/redux/reducers/contextmenu';
 import { Selection } from '../components/selection';
@@ -8,14 +9,27 @@ import { Files } from '../components/files/files.component';
 import { Folders } from '../components/folders/folders.component';
 import { Container } from '../styles/home.style';
 import { setPage } from '../../../../infrastructure/redux/reducers/pages';
+import { getSequencePaths } from '../../shared/utils/formatters/paths.formatter';
+import { FilesService } from '../../../../infrastructure/services/files/files.service';
+import { FolderService } from '../../../../infrastructure/services/folders/folders.service';
+import { CurrentFolder, FileChild, FolderChild } from '../../../../infrastructure/services/folders/folders.type';
 
-/** mocks **/
-import filesMock from '../../../../infrastructure/assets/mocks/files.json';
-import foldersMock from '../../../../infrastructure/assets/mocks/folders.json';
+interface Props {
+  folder?: boolean;
+}
 
-const HomePage: React.FC = () => {
+const HomePage: React.FC<Props> = (props) => {
+  const [files, setFiles] = useState<FileChild[]>([]);
+  const [folders, setFolders] = useState<FolderChild[]>([]);
+
   const dispatch = useDispatch();
   const inputFile = useRef<HTMLInputElement>(null);
+  const [Content, setContent] = useState<ReactNode>(null);
+
+  const { id } = useParams();
+
+  const filesService = new FilesService();
+  const foldersService = new FolderService();
 
   const pageContextMenuItems = [
     {
@@ -61,7 +75,7 @@ const HomePage: React.FC = () => {
   };
 
   const handleUpload = (type: 'Files' | 'Folders') => {
-    if (!inputFile.current) return;
+    if (!inputFile.current || !id) return;
 
     if (type === 'Files') {
       inputFile.current.setAttribute('name', 'file[]');
@@ -82,23 +96,31 @@ const HomePage: React.FC = () => {
     inputFile.current?.click();
   };
 
+  const handleFileChange = (e: Event) => {
+    const files = (e.target as HTMLInputElement).files;
+
+    if (!files || !id) return;
+
+    const formData = new FormData();
+
+    formData.append('userId', '62ba0237ca20daae241e8737');
+    formData.append('parentId', id);
+
+    for (let i = 0; i < files.length; i++) {
+      formData.append('files', files[i]);
+    }
+
+    filesService.uploadFiles(formData).then((res) => {
+      setFiles((f) => [...f, ...res]);
+    });
+  };
+
   const clearSelection = () => {
     dispatch(clearAllSelections());
   };
 
-  const getFiles = () => {
-    return filesMock.filter((f) => !f.isDeleted);
-  };
-
-  const getFolders = () => {
-    return foldersMock.filter((f) => !f.isDeleted);
-  };
-
   //!!! TODO: implementar useMemo
   const renderContent = () => {
-    const files = getFiles();
-    const folders = getFolders();
-
     const hasFiles = files.length > 0;
     const hasFolders = folders.length > 0;
 
@@ -113,21 +135,30 @@ const HomePage: React.FC = () => {
   };
 
   useEffect(() => {
-    dispatch(
-      setPage({
-        title: 'Início - FreeDrive',
-        headerTitle: 'Meu Drive',
-      })
-    );
+    const initialId = id || '62ba0256ca20daae241e8739';
+
+    foldersService.getFolderById(initialId).then((folder) => {
+      dispatch(
+        setPage({
+          title: (folder?.folderName || 'Início') + ' - FreeDrive',
+          pathSequence: getSequencePaths(folder),
+        })
+      );
+
+      setFiles(folder?.files || []);
+      setFolders(folder?.children || []);
+    });
 
     const container = document.getElementById('home-page');
     container?.addEventListener('mousedown', clearSelection);
+    inputFile.current?.addEventListener('change', handleFileChange);
 
     return () => {
       container?.removeEventListener('mousedown', clearSelection);
+      inputFile.current?.removeEventListener('change', handleFileChange);
       clearSelection();
     };
-  }, []);
+  }, [id]);
 
   return (
     <Selection>
