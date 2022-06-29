@@ -16,7 +16,7 @@ const Storage: React.FC<StoraDetails> = (props) => {
       <Text>Armazenamento ({getPercentage(props.used, props.total)})</Text>
       <Progress progress={getPercentage(props.used, props.total)} />
       <TextInfo>
-        {props.used} de {props.total}
+        {props.used} GB de {props.total} GB
       </TextInfo>
     </Container>
   );

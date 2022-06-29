@@ -1,89 +1,28 @@
-import { PrismaClient, Prisma, Folder } from '@prisma/client';
-import { CreateFolder, FolderHistory } from './folder.type';
+import { Types } from 'mongoose';
+import { BaseRepository } from '../../shared/repositories/base.repository';
+import { FolderModel, IFolder } from '../models/folder.model';
 
-class FolderRepository {
-  private _model: Prisma.FolderDelegate<any>;
-
+class FolderRepository extends BaseRepository<IFolder> {
   constructor() {
-    const prisma = new PrismaClient();
-    this._model = prisma.folder;
+    super(FolderModel);
   }
 
-  async find(params: Prisma.FolderWhereInput) {
-    return await this._model.findMany({
-      where: params,
-    });
-  }
-
-  async findById(id: string) {
-    return await this._model.findUnique({
-      where: { id },
-      include: {
-        children: {
-          select: {
-            id: true,
-            folderName: true,
-            color: true,
-            favorite: true,
-            deleted: true,
-          },
-        },
-        files: {
-          select: {
-            id: true,
-            fileName: true,
-            originalName: true,
-            mimetype: true,
-            favorite: true,
-            deleted: true,
-          },
-        },
-        parent: {
-          select: {
-            id: true,
-            folderName: true,
-          },
+  async findDeepById(id: string): Promise<any> {
+    return this.model.aggregate([
+      { $match: { _id: new Types.ObjectId(id) } },
+      { $lookup: { from: 'files', localField: '_id', foreignField: 'parentId', as: 'files' } },
+      { $lookup: { from: 'folders', localField: '_id', foreignField: 'parentId', as: 'children' } },
+      {
+        $graphLookup: {
+          from: 'folders',
+          startWith: '$parentId',
+          connectFromField: 'parentId',
+          connectToField: '_id',
+          as: 'parents',
+          depthField: 'depth',
         },
       },
-    });
-  }
-
-  async findHistory(id: string, history: FolderHistory[] = []): Promise<FolderHistory[] | undefined> {
-    const folder = await this._model.findUnique({
-      where: { id },
-      include: {
-        parent: {
-          select: {
-            id: true,
-            folderName: true,
-          },
-        },
-      },
-    });
-
-    if (folder?.parent) {
-      history.push(folder.parent);
-      return await this.findHistory(folder.parent.id, history);
-    } else {
-      return history;
-    }
-  }
-
-  async create(data: CreateFolder) {
-    return await this._model.create({ data });
-  }
-
-  async update(id: string, data: Folder) {
-    return await this._model.update({
-      where: { id },
-      data,
-    });
-  }
-
-  async delete(id: string) {
-    return await this._model.delete({
-      where: { id },
-    });
+    ]);
   }
 }
 

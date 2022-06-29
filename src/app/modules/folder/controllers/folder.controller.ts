@@ -1,88 +1,33 @@
-import { Request, Response } from 'express';
-import { FsHelper } from '../../../utils/helpers/fs.helper';
-import { httpStatusCode } from '../../../utils/helpers/httpStatus.helper';
+import { Response, Request } from 'express';
+import { Types } from 'mongoose';
+import { BaseController } from '../../shared/controllers/base.controller';
 import { FolderRepository } from '../repositories/folder.repository';
+import { IFolder } from '../models/folder.model';
+import { BadRequestException } from '../../shared/exceptions/badRequest.exception';
+import { NotfoundException } from '../../shared/exceptions/notfound.exception';
 
-class FolderController {
-  private _repository: FolderRepository;
-
+class FolderController extends BaseController<IFolder> {
   constructor() {
-    this._repository = new FolderRepository();
+    super(new FolderRepository());
   }
 
-  public async find(req: Request, res: Response): Promise<Response | undefined> {
-    const { query } = req;
-
-    const params = {
-      userId: query.userId ? String(query.userId) : undefined,
-      parentId: query.parentId ? String(query.parentId) : undefined,
-      favorite: query.favorite ? query.favorite === 'true' : undefined,
-      deleted: query.deleted ? query.deleted === 'true' : undefined,
-    };
-
-    try {
-      const file = await this._repository.find(params);
-      return res.status(httpStatusCode.OK).json(file);
-    } catch (e: any) {
-      res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({
-        error: e.message,
-      });
-    }
-  }
-
-  public async findById(req: Request, res: Response): Promise<Response | undefined> {
+  async findDeepById(req: Request, res: Response) {
     const { id } = req.params;
 
     try {
-      const folder = await this._repository.findById(id);
-
-      const response = {
-        ...folder,
-        history: [] as any,
-        parent: undefined,
-      };
-
-      if (folder?.parent) {
-        const history = await this._repository.findHistory(folder.parent.id);
-        if (history) response.history.push(folder.parent, ...history);
+      if (!Types.ObjectId.isValid(id)) {
+        throw new BadRequestException('Invalid id');
       }
 
-      return res.status(httpStatusCode.OK).json(response);
-    } catch (e: any) {
-      res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({
-        error: e.message,
-      });
-    }
-  }
+      const [result] = await this.repository.findDeepById(id);
 
-  public async create(req: Request, res: Response): Promise<Response | undefined> {
-    const { body } = req;
+      if (!result) {
+        throw new NotfoundException('Folder not found');
+      }
 
-    try {
-      const mongoSchema = {
-        folderName: body.folderName,
-        userId: body.userId,
-        parentId: body.parentId,
-      };
-
-      await this._repository.create(mongoSchema);
-
-      return res.status(httpStatusCode.OK).json({ message: 'Folder created successfully' });
-    } catch (e: any) {
-      res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({
-        error: e.message,
-      });
-    }
-  }
-
-  public async getDiskSpace(req: Request, res: Response): Promise<void> {
-    try {
-      const disk = await FsHelper.getDiskSpace();
-      res.status(httpStatusCode.OK).json(disk);
-    } catch (e: any) {
-      res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({
-        error: e.message,
-      });
+      return this.sendSuccess(res, result);
+    } catch (error: any) {
+      this.sendError(res, error);
     }
   }
 }

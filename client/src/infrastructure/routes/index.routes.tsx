@@ -21,9 +21,9 @@ const Routes: React.FC = () => {
   useEffect(() => {
     const folderService = new FolderService();
 
-    folderService.getDiskSpace().then((disk) => {
-      setDisk(disk);
-    });
+    // folderService.getDiskSpace().then((disk) => {
+    //   setDisk(disk);
+    // });
   }, []);
 
   return (

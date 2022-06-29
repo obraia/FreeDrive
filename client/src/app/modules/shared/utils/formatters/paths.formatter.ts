@@ -8,15 +8,15 @@ interface PathSequence {
 const getSequencePaths = (folder: CurrentFolder): PathSequence[] => {
   const sequence: PathSequence[] = [];
 
-  for (const h of folder.history.reverse()) {
+  for (const h of folder.parents.reverse()) {
     sequence.push({
-      id: h.id,
+      id: h._id,
       name: h.folderName,
     });
   }
 
   sequence.push({
-    id: folder.id,
+    id: folder._id,
     name: folder.folderName,
   });
 

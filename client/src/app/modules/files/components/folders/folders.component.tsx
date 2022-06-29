@@ -106,42 +106,42 @@ const Folders: React.FC<Props> = (props) => {
 
     const folder = props.folders[index];
 
-    if (e.buttons === 2 && selectedFolders.length >= 1 && selectedFolders.includes(folder.id)) {
+    if (e.buttons === 2 && selectedFolders.length >= 1 && selectedFolders.includes(folder._id)) {
       return;
     }
 
     let foldersIds = [] as string[];
 
     if (e.metaKey && selectedFolders.length > 0) {
-      if (selectedFolders.includes(folder.id)) {
-        foldersIds = selectedFolders.filter((i) => i !== folder.id);
+      if (selectedFolders.includes(folder._id)) {
+        foldersIds = selectedFolders.filter((i) => i !== folder._id);
       } else {
-        foldersIds = [...selectedFolders, folder.id];
+        foldersIds = [...selectedFolders, folder._id];
       }
     } else if (e.shiftKey && selectedFolders.length > 0) {
       const firstSelected = selectedFolders[0];
-      const firstIndex = props.folders.findIndex((f) => f.id === firstSelected);
+      const firstIndex = props.folders.findIndex((f) => f._id === firstSelected);
       const first = Math.min(firstIndex, index);
       const last = Math.max(firstIndex, index);
 
-      foldersIds = props.folders.filter((f, i) => i >= first && i <= last).map((f) => f.id);
+      foldersIds = props.folders.filter((f, i) => i >= first && i <= last).map((f) => f._id);
     } else {
-      foldersIds = [folder.id];
+      foldersIds = [folder._id];
     }
 
     dispatch(selectFolders({ ids: foldersIds }));
   };
 
   const goToFolder = (folder: FolderChild) => {
-    navigate(folder.id);
+    navigate(folder._id);
   };
 
   const renderFolders = () => {
     return props.folders.map((folder, index) => (
       <Folder
-        key={folder.id}
-        id={'folder_' + folder.id}
-        selected={selectedFolders.includes(folder.id)}
+        key={folder._id}
+        id={'folder_' + folder._id}
+        selected={selectedFolders.includes(folder._id)}
         onClickCapture={(e) => handleSelectFolder(e, index)}
         onContextMenu={(e) => handleContextMenu(e, index)}
         onMouseDownCapture={(e) => e.stopPropagation()}
@@ -155,7 +155,7 @@ const Folders: React.FC<Props> = (props) => {
 
   useEffect(() => {
     if (selectedFolders.length > 0) {
-      const folder = props.folders.find((f) => f.id === selectedFolders[0]);
+      const folder = props.folders.find((f) => f._id === selectedFolders[0]);
 
       if (folder) {
         const contextItems = folder.deleted ? deletedContextMenuItems() : regularContextMenuItems(folder);

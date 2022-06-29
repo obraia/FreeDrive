@@ -1,5 +1,5 @@
 export interface CurrentFolder {
-  id: string;
+  _id: string;
   userId: string;
   parentId: string;
   folderName: string;
@@ -11,11 +11,11 @@ export interface CurrentFolder {
   deletedAt?: any;
   children: FolderChild[];
   files: FileChild[];
-  history: History[];
+  parents: History[];
 }
 
 export interface FolderChild {
-  id: string;
+  _id: string;
   folderName: string;
   color?: any;
   favorite: boolean;
@@ -32,12 +32,12 @@ export interface FileChild {
 }
 
 export interface History {
-  id: string;
+  _id: string;
   folderName: string;
 }
 
 export interface GetFoldersResponse {
-  id: string;
+  _id: string;
   userId: string;
   parentId: string;
   folderName: string;

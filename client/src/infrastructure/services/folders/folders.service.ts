@@ -43,7 +43,7 @@ class FolderService {
   public async getFolderById(id: string): Promise<CurrentFolder> {
     return new Promise((resolve, reject) => {
       this.api
-        .get(`/folders/${id}`)
+        .get(`/folders/deep/${id}`)
         .then((response) => {
           resolve(response.data);
         })

@@ -21,7 +21,7 @@ const HomePage: React.FC = () => {
   const dispatch = useDispatch();
   const inputFile = useRef<HTMLInputElement>(null);
 
-  const { id: folderId = '62ba0256ca20daae241e8739' } = useParams();
+  const { id: folderId = '62bbc4d7edf858e4c6a9b98a' } = useParams();
   const userId = '62ba0237ca20daae241e8737';
 
   const filesService = new FilesService();
