@@ -1,4 +1,4 @@
-export interface CurrentFolder {
+export interface IFolder {
   _id: string;
   userId: string;
   parentId: string;
@@ -9,12 +9,12 @@ export interface CurrentFolder {
   createdAt: Date;
   updatedAt?: any;
   deletedAt?: any;
-  children: FolderChild[];
-  files: FileChild[];
-  parents: History[];
+  children: IFolderChild[];
+  files: IFileChild[];
+  parents: IFolderParent[];
 }
 
-export interface FolderChild {
+export interface IFolderChild {
   _id: string;
   folderName: string;
   color?: any;
@@ -22,8 +22,8 @@ export interface FolderChild {
   deleted: boolean;
 }
 
-export interface FileChild {
-  id: string;
+export interface IFileChild {
+  _id: string;
   fileName: string;
   originalName: string;
   mimetype: string;
@@ -31,20 +31,7 @@ export interface FileChild {
   deleted: boolean;
 }
 
-export interface History {
+export interface IFolderParent {
   _id: string;
   folderName: string;
-}
-
-export interface GetFoldersResponse {
-  _id: string;
-  userId: string;
-  parentId: string;
-  folderName: string;
-  color?: any;
-  favorite: boolean;
-  deleted: boolean;
-  createdAt: Date;
-  updatedAt?: any;
-  deletedAt?: any;
 }

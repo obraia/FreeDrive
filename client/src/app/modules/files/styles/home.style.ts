@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import { lighten, transparentize } from "polished";
+import styled from 'styled-components';
+import { lighten, transparentize } from 'polished';
 
 export const Container = styled.div<{ isDragOver?: Boolean }>`
   flex: 1;
@@ -8,7 +8,7 @@ export const Container = styled.div<{ isDragOver?: Boolean }>`
   padding: 20px;
   gap: 20px;
   border-radius: ${({ theme }) => theme.metrics.radius};
-  background-color: ${({ theme }) => lighten(0.08, theme.colors.background)};
+  background-color: ${({ theme }) => lighten(0.05, theme.colors.background)};
   overflow-y: auto;
 
   ${({ theme, isDragOver }) =>
@@ -30,7 +30,7 @@ export const Container = styled.div<{ isDragOver?: Boolean }>`
       }
   `};
 
-  & > input[type="file"] {
+  & > input[type='file'] {
     display: none;
   }
 `;

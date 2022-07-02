@@ -1,11 +1,11 @@
-import { CurrentFolder } from '../../../../../infrastructure/services/folders/folders.type';
+import { IFolder } from '../../../../../infrastructure/services/folder/interfaces';
 
 interface PathSequence {
   id: string;
   name: string;
 }
 
-const getSequencePaths = (folder: CurrentFolder): PathSequence[] => {
+const getSequencePaths = (folder: IFolder): PathSequence[] => {
   const sequence: PathSequence[] = [];
 
   for (const h of folder.parents.reverse()) {

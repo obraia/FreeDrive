@@ -11,8 +11,8 @@ import { ContextMenu } from '../../app/modules/shared/components/layout_componen
 import { Topbar } from '../../app/modules/files/components/topbar';
 import { Storage } from '../../app/modules/shared/components/storage';
 import { Aside } from '../../app/modules/shared/components/layout_components/aside/styles';
-import { Disk } from '../services/files/files.service';
-import { FolderService } from '../services/folders/folders.service';
+import { Disk } from '../services/file/file.service';
+import { FolderService } from '../services/folder/folder.service';
 
 const Routes: React.FC = () => {
   const [disk, setDisk] = React.useState<Disk>({ total: 1, used: 1 });

@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
 import { IFolder } from '../../folder/models/folder.model';
 import { IUser } from '../../user/models/user.model';
 
@@ -79,6 +79,13 @@ const fileSchema = new Schema(
     toObject: { virtuals: true, getters: true },
   }
 );
+
+fileSchema.virtual('parent', {
+  ref: 'folders',
+  localField: 'parentId',
+  foreignField: '_id',
+  justOne: true,
+});
 
 const FileModel = model<IFile>('files', fileSchema);
 

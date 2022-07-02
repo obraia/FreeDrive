@@ -11,7 +11,7 @@ export const Container = styled.div<{ xPos: number; yPos: number }>`
   gap: ${({ theme }) => theme.metrics.gap};
   border: 1px solid ${({ theme }) => lighten(0.4, theme.colors.textBackground)};
   border-radius: ${({ theme }) => theme.metrics.radius};
-  background-color: ${({ theme }) => lighten(0.08, theme.colors.background)};
+  background-color: ${({ theme }) => lighten(0.05, theme.colors.background)};
   box-shadow: 0px 0px 10px #00000020;
 `;
 

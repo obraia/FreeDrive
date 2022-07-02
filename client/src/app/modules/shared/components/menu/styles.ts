@@ -10,7 +10,7 @@ export const Container = styled.div`
   padding: ${({ theme }) => theme.metrics.padding};
   gap: ${({ theme }) => theme.metrics.gap};
   border-radius: ${({ theme }) => theme.metrics.radius};
-  background-color: ${({ theme }) => lighten(0.08, theme.colors.background)};
+  background-color: ${({ theme }) => lighten(0.05, theme.colors.background)};
 `;
 
 export const MenuItems = styled.nav`

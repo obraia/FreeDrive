@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { TbFile } from 'react-icons/tb';
-import { FileChild } from '../../../../../infrastructure/services/folders/folders.type';
+import { IFileChild } from '../../../../../infrastructure/services/folder/interfaces';
 
 export interface Props {
-  file: FileChild;
+  file: IFileChild;
 }
 
 const Preview: React.FC<Props> = (props) => {
@@ -17,7 +17,7 @@ const Preview: React.FC<Props> = (props) => {
       pdf: <iframe src={src} title='pdf' />,
     }[type]);
 
-  const handleFileType = (file: FileChild) => {
+  const handleFileType = (file: IFileChild) => {
     if (file.mimetype.includes('image')) {
       setType('image');
     } else if (file.mimetype.includes('video')) {
@@ -35,7 +35,7 @@ const Preview: React.FC<Props> = (props) => {
     handleFileType(props.file);
   }, [props.file]);
 
-  return options(type, 'http://localhost:3003/api/static/' + props.file.fileName) || <TbFile size={36} />;
+  return options(type, 'http://localhost:3003/api/static/thumb/' + props.file.fileName) || <TbFile size={36} />;
 };
 
 export { Preview };

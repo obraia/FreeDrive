@@ -1,5 +1,5 @@
 import { Response, Request } from 'express';
-import { FilterQuery, Types } from 'mongoose';
+import { Types } from 'mongoose';
 import { BadRequestException } from '../exceptions/badRequest.exception';
 import { NotfoundException } from '../exceptions/notfound.exception';
 import { StatusException } from '../exceptions/status.exception';
@@ -10,10 +10,8 @@ class BaseController<T> {
   constructor(protected repository: BaseRepository<T>) {}
 
   public async find(req: Request, res: Response) {
-    const { query } = req;
-
     try {
-      const result = await this.repository.findAll(query as FilterQuery<T>);
+      const result = await this.repository.findAll({});
       return this.sendSuccess(res, result);
     } catch (error: any) {
       this.sendError(res, error);
@@ -71,7 +69,7 @@ class BaseController<T> {
     }
   }
 
-  public async delete(req: Request, res: Response) {
+  public async deleteById(req: Request, res: Response) {
     const { id } = req.params;
 
     try {
@@ -91,12 +89,36 @@ class BaseController<T> {
     }
   }
 
+  public async deleteMany(req: Request, res: Response) {
+    const ids = req.query.ids as string[];
+
+    try {
+      if (Array.from<string>(ids).some((id) => !Types.ObjectId.isValid(id))) {
+        throw new BadRequestException('Invalid ids');
+      }
+
+      const result = await this.repository.deleteMany(ids);
+
+      if (!result) {
+        throw new NotfoundException('Not found');
+      }
+
+      return this.sendSuccess(res, result);
+    } catch (error: any) {
+      this.sendError(res, error);
+    }
+  }
+
   protected sendSuccess(res: Response, object: Object) {
     return res.status(httpStatusCode.OK).json(object);
   }
 
   protected sendCreated(res: Response, object: Object) {
     return res.status(httpStatusCode.CREATED).json(object);
+  }
+
+  protected sendFile(res: Response, path: string, cb?: () => void) {
+    return res.download(path, cb);
   }
 
   protected sendError(res: Response, error: StatusException) {

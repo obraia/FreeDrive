@@ -7,11 +7,39 @@ class FolderRepository extends BaseRepository<IFolder> {
     super(FolderModel);
   }
 
-  async findDeepById(id: string): Promise<any> {
+  async findDeepById(id: string, params: any): Promise<any> {
     return this.model.aggregate([
       { $match: { _id: new Types.ObjectId(id) } },
-      { $lookup: { from: 'files', localField: '_id', foreignField: 'parentId', as: 'files' } },
-      { $lookup: { from: 'folders', localField: '_id', foreignField: 'parentId', as: 'children' } },
+      {
+        $lookup: {
+          from: 'files',
+          let: { folderId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                ...params,
+                $expr: { $eq: ['$parentId', '$$folderId'] },
+              },
+            },
+          ],
+          as: 'files',
+        },
+      },
+      {
+        $lookup: {
+          from: 'folders',
+          let: { folderId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                ...params,
+                $expr: { $eq: ['$parentId', '$$folderId'] },
+              },
+            },
+          ],
+          as: 'children',
+        },
+      },
       {
         $graphLookup: {
           from: 'folders',
@@ -23,6 +51,43 @@ class FolderRepository extends BaseRepository<IFolder> {
         },
       },
     ]);
+  }
+
+  async findDeepChildren(ids: Types.ObjectId[]): Promise<any> {
+    return this.model.aggregate([
+      { $match: { _id: { $in: ids } } },
+      {
+        $lookup: {
+          from: 'folders',
+          let: { folderId: '$_id' },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$parentId', '$$folderId'] }, deleted: false } },
+            { $project: { _id: 1, folderName: 1 } },
+          ],
+          as: 'children',
+        },
+      },
+      {
+        $lookup: {
+          from: 'files',
+          let: { folderId: '$_id' },
+          pipeline: [
+            { $match: { $expr: { $eq: ['$parentId', '$$folderId'] }, deleted: false } },
+            { $project: { originalName: 1, path: 1 } },
+          ],
+          as: 'files',
+        },
+      },
+      { $project: { folderName: 1, children: 1, files: 1 } },
+    ]);
+  }
+
+  async favorite(ids: string[], favorite: boolean) {
+    return await this.model.updateMany({ _id: { $in: ids } }, [{ $set: { favorite } }]);
+  }
+
+  async moveToTrash(ids: string[]) {
+    return await this.model.updateMany({ _id: { $in: ids } }, { $set: { deleted: true } });
   }
 }
 

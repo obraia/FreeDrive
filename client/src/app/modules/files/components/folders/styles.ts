@@ -37,15 +37,16 @@ export const Body = styled.div`
   padding: ${({ theme }) => theme.metrics.padding};
 `;
 
-export const Folder = styled.div<{ selected?: Boolean }>`
+export const Folder = styled.div`
   height: 54px;
+  position: relative;
   display: flex;
   align-items: center;
   padding: 15px;
   gap: ${({ theme }) => theme.metrics.gap};
   border: 1px solid ${({ theme }) => transparentize(0.8, theme.colors.textBackground)};
   border-radius: ${({ theme }) => theme.metrics.radius};
-  background-color: ${({ theme }) => lighten(0.08, theme.colors.background)};
+  background-color: ${({ theme }) => lighten(0.05, theme.colors.background)};
   color: ${({ theme }) => theme.colors.textBackground};
   font-size: 12px;
 
@@ -53,11 +54,25 @@ export const Folder = styled.div<{ selected?: Boolean }>`
     background-color: #00000010;
   }
 
-  ${({ theme, selected }) =>
-    selected &&
-    `
-      border-color: ${transparentize(0.8, theme.colors.primary)};
-      background-color: ${transparentize(0.8, theme.colors.primary)};
-      color: ${theme.colors.primary};
-  `};
+  &.selected {
+    border-color: ${({ theme }) => transparentize(0.8, theme.colors.primary)};
+    background-color: ${({ theme }) => transparentize(0.8, theme.colors.primary)};
+    color: ${({ theme }) => theme.colors.primary};
+  }
+`;
+
+export const FavoriteLabel = styled.div`
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 12px;
+  font-weight: normal;
+  color: ${({ theme }) => theme.colors.background};
+  background-color: ${({ theme }) => lighten(0.05, theme.colors.textBackground)};
+  border-radius: 50%;
 `;

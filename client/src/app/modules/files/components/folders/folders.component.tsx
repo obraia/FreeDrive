@@ -4,14 +4,19 @@ import { FaFolder } from 'react-icons/fa';
 import { TbArrowUp, TbDownload, TbHeart, TbHeartBroken, TbInfoCircle, TbLink, TbPencil, TbTrash } from 'react-icons/tb';
 import { RootState } from '../../../../../infrastructure/redux/store';
 import { selectFolders, setContextMenuItems } from '../../reducers/files.reducer';
-import { showMenu } from '../../../../../infrastructure/redux/reducers/contextmenu';
-import { Body, Container, Folder, Header, SortButton, Title } from './styles';
+import { hideMenu, showMenu } from '../../../../../infrastructure/redux/reducers/contextmenu';
+import { Body, Container, Folder, Header, SortButton, Title, FavoriteLabel } from './styles';
 import { MdRestore } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import { FolderChild } from '../../../../../infrastructure/services/folders/folders.type';
+import { IFolderChild } from '../../../../../infrastructure/services/folder/interfaces';
+import { HomeControllerType } from '../../pages/home/home.controller';
+import { ContextMenuItem } from '../../../shared/components/layout_components/contextmenu';
 
 interface Props {
-  folders: FolderChild[];
+  folders: IFolderChild[];
+  handleFavorite: (ids: string[], type: HomeControllerType, favorite: boolean) => Promise<void>;
+  handleDownload: (ids: string[], type: HomeControllerType) => Promise<void>;
+  handleDelete: (ids: string[], type: HomeControllerType) => Promise<void>;
 }
 
 const Folders: React.FC<Props> = (props) => {
@@ -19,14 +24,7 @@ const Folders: React.FC<Props> = (props) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const regularContextMenuItems = (folder: FolderChild) => [
-    {
-      id: 1,
-      name: 'Copiar link',
-      icon: TbLink,
-      single: true,
-      onClick: () => {},
-    },
+  const regularContextMenuItems = (folder: Partial<IFolderChild>) => [
     {
       id: 2,
       name: 'Renomear',
@@ -39,21 +37,21 @@ const Folders: React.FC<Props> = (props) => {
       name: folder.favorite ? 'Desfavoritar' : 'Favoritar',
       icon: folder.favorite ? TbHeartBroken : TbHeart,
       single: false,
-      onClick: () => {},
+      onClick: () => props.handleFavorite(selectedFolders, 'Folder', !Boolean(folder.favorite)),
     },
     {
       id: 4,
       name: 'Fazer download',
       icon: TbDownload,
       single: false,
-      onClick: () => {},
+      onClick: () => props.handleDownload(selectedFolders, 'Folder'),
     },
     {
       id: 5,
       name: 'Excluir',
       icon: TbTrash,
       single: false,
-      onClick: () => {},
+      onClick: () => props.handleDelete(selectedFolders, 'Folder'),
     },
     {
       id: 6,
@@ -88,17 +86,28 @@ const Folders: React.FC<Props> = (props) => {
     },
   ];
 
+  const getContextMenuItems = (): ContextMenuItem[] => {
+    const folders = props.folders.filter((f) => selectedFolders.includes(f._id));
+
+    const hasFavorite = folders.every((f) => f.favorite) || (folders[0].favorite && folders.length === 1);
+    const hasDeleted = folders.some((f) => f.deleted);
+
+    const contextItems = hasDeleted
+      ? deletedContextMenuItems()
+      : regularContextMenuItems({
+          favorite: hasFavorite,
+        });
+
+    return contextItems;
+  };
+
   const handleContextMenu = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, index: number) => {
     e.stopPropagation();
     e.preventDefault();
 
     handleSelectFolder(e, index);
 
-    const folder = props.folders[index];
-
-    const contextItems = folder.deleted ? deletedContextMenuItems() : regularContextMenuItems(folder);
-
-    dispatch(showMenu({ items: contextItems, xPos: e.pageX, yPos: e.pageY }));
+    dispatch(showMenu({ items: getContextMenuItems(), xPos: e.pageX, yPos: e.pageY }));
   };
 
   const handleSelectFolder = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, index: number) => {
@@ -109,6 +118,8 @@ const Folders: React.FC<Props> = (props) => {
     if (e.buttons === 2 && selectedFolders.length >= 1 && selectedFolders.includes(folder._id)) {
       return;
     }
+
+    dispatch(hideMenu());
 
     let foldersIds = [] as string[];
 
@@ -132,7 +143,7 @@ const Folders: React.FC<Props> = (props) => {
     dispatch(selectFolders({ ids: foldersIds }));
   };
 
-  const goToFolder = (folder: FolderChild) => {
+  const goToFolder = (folder: IFolderChild) => {
     navigate(folder._id);
   };
 
@@ -141,12 +152,12 @@ const Folders: React.FC<Props> = (props) => {
       <Folder
         key={folder._id}
         id={'folder_' + folder._id}
-        selected={selectedFolders.includes(folder._id)}
-        onClickCapture={(e) => handleSelectFolder(e, index)}
+        className={selectedFolders.includes(folder._id) ? 'selected' : ''}
+        onMouseDownCapture={(e) => handleSelectFolder(e, index)}
         onContextMenu={(e) => handleContextMenu(e, index)}
-        onMouseDownCapture={(e) => e.stopPropagation()}
         onDoubleClick={() => goToFolder(folder)}
       >
+        {folder.favorite && <FavoriteLabel children={<TbHeart />} />}
         <FaFolder size={20} color={folder.color || undefined} />
         {folder.folderName}
       </Folder>
@@ -155,15 +166,9 @@ const Folders: React.FC<Props> = (props) => {
 
   useEffect(() => {
     if (selectedFolders.length > 0) {
-      const folder = props.folders.find((f) => f._id === selectedFolders[0]);
-
-      if (folder) {
-        const contextItems = folder.deleted ? deletedContextMenuItems() : regularContextMenuItems(folder);
-
-        dispatch(setContextMenuItems({ items: contextItems }));
-      }
+      dispatch(setContextMenuItems({ items: getContextMenuItems() }));
     }
-  }, [selectedFolders]);
+  }, [selectedFolders, props.folders]);
 
   return (
     <Container>

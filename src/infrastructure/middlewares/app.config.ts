@@ -24,10 +24,17 @@ class AppConfig {
 
   private config(): void {
     this.app.use(helmet({ contentSecurityPolicy: false }));
-    this.app.use(cors());
     this.app.use(compression());
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
+
+    this.app.use(
+      cors({
+        credentials: true,
+        origin: 'http://localhost:3000',
+        exposedHeaders: ['File-Name'],
+      })
+    );
   }
 
   private router(): void {

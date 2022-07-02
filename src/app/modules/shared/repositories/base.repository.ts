@@ -5,16 +5,20 @@ class BaseRepository<T> {
 
   constructor(protected model: Model<T>) {}
 
-  findOne(params: FilterQuery<T>): Promise<T | null> {
+  createDocument(data: Omit<T, '_id'> | Omit<T, '_id'>[]) {
+    return new this.model(data);
+  }
+
+  findOne(params: FilterQuery<T>) {
     return this.model.findOne(params).exec();
   }
 
-  findAll(params: FilterQuery<T>): Promise<T[]> {
+  findAll(params: FilterQuery<T>) {
     return this.model.find(params).exec();
   }
 
-  findById(id: string) {
-    return this.model.findById(id).exec();
+  findById(id: string, populate?: string[]) {
+    return populate ? this.model.findById(id).populate(populate) : this.model.findById(id);
   }
 
   create(data: Omit<T, '_id'> | Omit<T, '_id'>[]) {
@@ -33,7 +37,11 @@ class BaseRepository<T> {
     return this.model.deleteOne(params).exec();
   }
 
-  createMany(data: T[]): Promise<HydratedDocument<MergeType<MergeType<T, T>, RequireOnlyTypedId<T>>, {}, {}>[]> {
+  deleteMany(ids: string[]) {
+    return this.model.deleteMany({ _id: { $in: ids } }).exec();
+  }
+
+  createMany(data: T[]) {
     return this.model.insertMany(data);
   }
 }

@@ -38,8 +38,15 @@ export const Body = styled.div`
   padding: ${({ theme }) => theme.metrics.padding};
 `;
 
-export const File = styled.div<{ selected?: Boolean }>`
+export const FileName = styled.div`
+  font-size: 14px;
+  font-weight: normal;
+  color: ${({ theme }) => theme.colors.textBackground};
+`;
+
+export const File = styled.div`
   aspect-ratio: 1;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -48,7 +55,7 @@ export const File = styled.div<{ selected?: Boolean }>`
   gap: ${({ theme }) => theme.metrics.gap};
   border: 1px solid ${({ theme }) => transparentize(0.8, theme.colors.textBackground)};
   border-radius: ${({ theme }) => theme.metrics.radius};
-  background-color: ${({ theme }) => lighten(0.08, theme.colors.background)};
+  background-color: ${({ theme }) => lighten(0.05, theme.colors.background)};
   color: ${({ theme }) => theme.colors.textBackground};
   text-align: center;
   transition: background-color 0.2s;
@@ -57,17 +64,15 @@ export const File = styled.div<{ selected?: Boolean }>`
     background-color: #00000010;
   }
 
-  ${({ theme, selected }) =>
-    selected &&
-    `
-      border-color: ${transparentize(0.8, theme.colors.primary)};
-      background-color: ${transparentize(0.8, theme.colors.primary)};
-      color: ${theme.colors.primary};
+  &.selected {
+    border-color: ${({ theme }) => transparentize(0.8, theme.colors.primary)};
+    background-color: ${({ theme }) => transparentize(0.8, theme.colors.primary)};
+    color: ${({ theme }) => theme.colors.primary};
 
-      ${FileName} {
-        color: ${theme.colors.primary};
-      }
-  `};
+    ${FileName} {
+      color: ${({ theme }) => theme.colors.primary};
+    }
+  }
 
   > img,
   > video,
@@ -81,8 +86,18 @@ export const File = styled.div<{ selected?: Boolean }>`
   }
 `;
 
-export const FileName = styled.div`
-  font-size: 14px;
+export const FavoriteLabel = styled.div`
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 18px;
   font-weight: normal;
   color: ${({ theme }) => theme.colors.textBackground};
+  background-color: ${({ theme }) => lighten(0.05, theme.colors.background)};
+  border-radius: 50%;
 `;

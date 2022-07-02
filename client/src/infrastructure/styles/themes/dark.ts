@@ -8,7 +8,7 @@ export default {
     textPrimary: '#DBDBDB',
     secondary: '#171718',
     textSecondary: '#eaeaea',
-    background: '#171718',
+    background: '#0D0D0D',
     textBackground: '#eaeaea',
     error: '#eb6464',
     textError: '#252525',

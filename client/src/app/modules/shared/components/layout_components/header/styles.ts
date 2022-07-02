@@ -1,6 +1,6 @@
-import { lighten } from "polished";
-import styled from "styled-components";
-import { Button } from "../../button/styles";
+import { lighten } from 'polished';
+import styled from 'styled-components';
+import { Button } from '../../button/styles';
 
 export const Container = styled.header`
   grid-area: header;
@@ -10,7 +10,7 @@ export const Container = styled.header`
   gap: ${({ theme }) => theme.metrics.gap};
   padding: ${({ theme }) => theme.metrics.padding};
   border-radius: ${({ theme }) => theme.metrics.radius};
-  background-color: ${({ theme }) => lighten(0.08, theme.colors.background)};
+  background-color: ${({ theme }) => lighten(0.05, theme.colors.background)};
 `;
 
 export const Title = styled.h1`

@@ -9,6 +9,7 @@ export interface ContextMenuItem {
   id: number;
   name: string;
   icon: IconType;
+  single?: boolean;
   onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }
 

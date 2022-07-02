@@ -4,22 +4,27 @@ import { TbArrowUp, TbDownload, TbHeart, TbHeartBroken, TbInfoCircle, TbLink, Tb
 import { MdRestore } from 'react-icons/md';
 import { RootState } from '../../../../../infrastructure/redux/store';
 import { selectFiles, setContextMenuItems } from '../../reducers/files.reducer';
-import { showMenu } from '../../../../../infrastructure/redux/reducers/contextmenu';
+import { hideMenu, showMenu } from '../../../../../infrastructure/redux/reducers/contextmenu';
 import { Preview } from './preview.component';
-import { Body, Container, File, FileName, Header, SortButton, Title } from './styles';
-import { FileChild } from '../../../../../infrastructure/services/folders/folders.type';
+import { Body, Container, FavoriteLabel, File, FileName, Header, SortButton, Title } from './styles';
+import { IFileChild } from '../../../../../infrastructure/services/folder/interfaces';
 import { middleTruncateString } from '../../../shared/utils/formatters/string.formatter';
+import { HomeControllerType } from '../../pages/home/home.controller';
+import { ContextMenuItem } from '../../../shared/components/layout_components/contextmenu';
 
 interface Props {
-  files: FileChild[];
+  files: IFileChild[];
   selectedFiles?: number[];
+  handleFavorite: (ids: string[], type: HomeControllerType, favorite: boolean) => Promise<void>;
+  handleDownload: (ids: string[], type: HomeControllerType) => Promise<void>;
+  handleDelete: (ids: string[], type: HomeControllerType) => Promise<void>;
 }
 
 const Files: React.FC<Props> = (props) => {
   const { selectedFiles } = useSelector((state: RootState) => state.files);
   const dispatch = useDispatch();
 
-  const regularContextMenuItems = (file: FileChild) => [
+  const regularContextMenuItems = (file: Partial<IFileChild>) => [
     {
       id: 1,
       name: 'Copiar link',
@@ -39,21 +44,21 @@ const Files: React.FC<Props> = (props) => {
       name: file.favorite ? 'Desfavoritar' : 'Favoritar',
       icon: file.favorite ? TbHeartBroken : TbHeart,
       single: false,
-      onClick: () => {},
+      onClick: () => props.handleFavorite(selectedFiles, 'File', !Boolean(file.favorite)),
     },
     {
       id: 4,
       name: 'Fazer download',
       icon: TbDownload,
       single: false,
-      onClick: () => {},
+      onClick: () => props.handleDownload(selectedFiles, 'File'),
     },
     {
       id: 5,
       name: 'Excluir',
       icon: TbTrash,
       single: false,
-      onClick: () => {},
+      onClick: () => props.handleDelete(selectedFiles, 'File'),
     },
     {
       id: 6,
@@ -88,17 +93,28 @@ const Files: React.FC<Props> = (props) => {
     },
   ];
 
+  const getContextMenuItems = (): ContextMenuItem[] => {
+    const files = props.files.filter((f) => selectedFiles.includes(f._id));
+
+    const hasFavorite = files.every((f) => f.favorite) || (files[0].favorite && files.length === 1);
+    const hasDeleted = files.some((f) => f.deleted);
+
+    const contextItems = hasDeleted
+      ? deletedContextMenuItems()
+      : regularContextMenuItems({
+          favorite: hasFavorite,
+        });
+
+    return contextItems;
+  };
+
   const handleContextMenu = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, index: number) => {
     e.stopPropagation();
     e.preventDefault();
 
     handleSelectFile(e, index);
 
-    const file = props.files[index];
-
-    const contextItems = file.deleted ? deletedContextMenuItems() : regularContextMenuItems(file);
-
-    dispatch(showMenu({ items: contextItems, xPos: e.pageX, yPos: e.pageY }));
+    dispatch(showMenu({ items: getContextMenuItems(), xPos: e.pageX, yPos: e.pageY }));
   };
 
   const handleSelectFile = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, index: number) => {
@@ -106,27 +122,29 @@ const Files: React.FC<Props> = (props) => {
 
     const file = props.files[index];
 
-    if (e.buttons === 2 && selectedFiles.length >= 1 && selectedFiles.includes(file.id)) {
+    if (e.buttons === 2 && selectedFiles.length >= 1 && selectedFiles.includes(file._id)) {
       return;
     }
+
+    dispatch(hideMenu());
 
     let filesIds = [] as string[];
 
     if (e.metaKey && selectedFiles.length > 0) {
-      if (selectedFiles.includes(file.id)) {
-        filesIds = selectedFiles.filter((i) => i !== file.id);
+      if (selectedFiles.includes(file._id)) {
+        filesIds = selectedFiles.filter((i) => i !== file._id);
       } else {
-        filesIds = [file.id, ...selectedFiles];
+        filesIds = [file._id, ...selectedFiles];
       }
     } else if (e.shiftKey && selectedFiles.length > 0) {
       const firstSelected = selectedFiles[0];
-      const firstIndex = props.files.findIndex((f) => f.id === firstSelected);
+      const firstIndex = props.files.findIndex((f) => f._id === firstSelected);
       const first = Math.min(firstIndex, index);
       const last = Math.max(firstIndex, index);
 
-      filesIds = props.files.filter((f, i) => i >= first && i <= last).map((f) => f.id);
+      filesIds = props.files.filter((f, i) => i >= first && i <= last).map((f) => f._id);
     } else {
-      filesIds = [file.id];
+      filesIds = [file._id];
     }
 
     dispatch(selectFiles({ ids: filesIds }));
@@ -135,13 +153,13 @@ const Files: React.FC<Props> = (props) => {
   const renderFiles = () => {
     return props.files.map((file, index) => (
       <File
-        key={file.id}
-        id={'file_' + file.id}
-        selected={selectedFiles.includes(file.id)}
-        onClickCapture={(e) => handleSelectFile(e, index)}
+        key={file._id}
+        id={'file_' + file._id}
+        className={selectedFiles.includes(file._id) ? 'selected' : ''}
+        onMouseDownCapture={(e) => handleSelectFile(e, index)}
         onContextMenu={(e) => handleContextMenu(e, index)}
-        onMouseDownCapture={(e) => e.stopPropagation()}
       >
+        {file.favorite && <FavoriteLabel children={<TbHeart />} />}
         <Preview file={file} />
         <FileName>{middleTruncateString(file.originalName, 15)}</FileName>
       </File>
@@ -150,15 +168,9 @@ const Files: React.FC<Props> = (props) => {
 
   useEffect(() => {
     if (selectedFiles.length > 0) {
-      const file = props.files.find((f) => f.id === selectedFiles[0]);
-
-      if (file) {
-        const contextItems = file.deleted ? deletedContextMenuItems() : regularContextMenuItems(file);
-
-        dispatch(setContextMenuItems({ items: contextItems }));
-      }
+      dispatch(setContextMenuItems({ items: getContextMenuItems() }));
     }
-  }, [selectedFiles]);
+  }, [selectedFiles, props.files]);
 
   return (
     <Container>
