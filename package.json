@@ -7,7 +7,8 @@
   "license": "MIT",
   "scripts": {
     "start": "node index.js",
-    "dev": "ts-node-dev --tree-kill --no-notify --respawn --transpile-only index.ts",
+    "start:client": "npm run start --prefix client",
+    "dev": "tsnd --tree-kill --no-notify --respawn --transpile-only index.ts --start:client",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc --build",
     "copy": "copyfiles ./.env ./package.json ./src/**/*.prisma ./src/**/*.graphql dist",
@@ -20,7 +21,6 @@
     "prisma:seed": "npx prisma db seed",
     "prisma:push": "npx prisma db push",
     "react:build": "npm run build --prefix client",
-    "react:start": "npm run start --prefix client",
     "heroku:prd": "cd dist && git branch -M main && git add . && git commit -m \"Nova versão\" && git push -u origin main -f",
     "heroku:dev": "cd dist && git branch -M dev && git add . && git commit -m \"Nova versão\" && git push -u origin dev -f",
     "heroku-postbuild": "npm run prisma:generate"
@@ -30,6 +30,7 @@
     "seed": "ts-node  ./src/infrastructure/database/prisma/seed.ts"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.5.0",
     "@types/bcrypt": "^5.0.0",
     "@types/compression": "^1.7.2",
     "@types/cors": "^2.8.12",
@@ -37,7 +38,9 @@
     "@types/firebase": "^3.2.1",
     "@types/jsonwebtoken": "^8.5.5",
     "@types/luxon": "^2.0.9",
+    "@types/mkdirp": "^1.0.2",
     "@types/multer": "^1.4.7",
+    "@types/sharp": "^0.30.4",
     "@types/uuid": "^8.3.1",
     "copyfiles": "^2.4.1",
     "nodemon": "^2.0.12",
@@ -49,12 +52,16 @@
   "dependencies": {
     "@prisma/client": "^3.9.1",
     "@prisma/engines": "^2.23.0-14.62b5651ea3cae584baaddfb914e40e827acc6696",
+    "adm-zip": "^0.5.9",
+    "archiver": "^5.3.1",
+    "autobind-decorator": "^2.4.0",
     "axios": "^0.26.0",
     "bcrypt": "^5.0.1",
     "check-disk-space": "^3.3.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
+    "dotenv-expand": "^8.0.3",
     "express": "^4.17.1",
     "firebase": "^9.0.1",
     "firebase-admin": "^9.11.1",
@@ -62,7 +69,10 @@
     "helmet": "^4.6.0",
     "jsonwebtoken": "^8.5.1",
     "luxon": "^2.3.0",
+    "mkdirp": "^1.0.4",
+    "mongoose": "^6.4.1",
     "multer": "^1.4.5-lts.1",
+    "sharp": "^0.30.7",
     "uuid": "^8.3.2"
   }
 }

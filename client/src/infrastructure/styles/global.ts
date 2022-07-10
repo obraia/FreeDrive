@@ -16,7 +16,7 @@ const GlobalStyle = createGlobalStyle`
     overflow: hidden;
   }
 
-  #root {
+  #app {
     height: 100vh;
     display: flex;
     flex-direction: column;

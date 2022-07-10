@@ -1,9 +1,9 @@
-import styled from "styled-components";
-import { darken } from "polished";
-import { Button } from "../button/styles";
+import styled from 'styled-components';
+import { darken, transparentize } from 'polished';
+import { Button } from '../button/styles';
 
 export const Container = styled.div<{ width?: string }>`
-  width: ${({ width }) => width || "100%"};
+  width: ${({ width }) => width || '100%'};
   height: 100%;
   display: flex;
   align-items: center;
@@ -11,6 +11,10 @@ export const Container = styled.div<{ width?: string }>`
   gap: ${({ theme }) => theme.metrics.gap};
   border-radius: ${({ theme }) => theme.metrics.inner_radius};
   background-color: ${({ theme }) => theme.colors.background};
+
+  &:focus-within {
+    outline: 1px solid ${({ theme }) => transparentize(0.8, theme.colors.textBackground)};
+  }
 `;
 
 export const SearchButton = styled(Button)`

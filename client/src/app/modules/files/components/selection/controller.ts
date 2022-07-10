@@ -82,7 +82,9 @@ class SelectionController {
   bindEvents() {
     this.mouseDown = this.mouseDown.bind(this);
     this.mouseUp = this.mouseUp.bind(this);
+    this.scroll = this.scroll.bind(this);
     this.container.addEventListener('mousedown', this.mouseDown);
+    // this.container.addEventListener('scroll', this.scroll);
     window.addEventListener('mouseup', this.mouseUp);
   }
 
@@ -90,10 +92,13 @@ class SelectionController {
     window.removeEventListener('mousemove', this.mouseMove);
     this.resetSelection();
     this.clearSelections();
+
+    SelectionController.intialScrollY = 0;
   }
 
   destroy() {
     this.container.removeEventListener('mousedown', this.mouseDown);
+    // this.container.removeEventListener('scroll', this.scroll);
     window.removeEventListener('mousemove', this.mouseMove);
     window.removeEventListener('mouseup', this.mouseUp);
   }
@@ -238,6 +243,32 @@ class SelectionController {
       this.onSelectionEnd();
     }
   }
+
+  scroll(e: Event) {
+    e.stopImmediatePropagation();
+
+    if (SelectionController.selection && e.target) {
+      const { top, height } = SelectionController.selection.getBoundingClientRect();
+      const scrollTop = (e as any).target.scrollTop;
+      console.log(height, scrollTop - SelectionController.intialScrollY);
+
+      if (!SelectionController.intialScrollY) {
+        SelectionController.intialScrollY = scrollTop;
+        SelectionController.intialHeigth = height;
+        SelectionController.intialTop = top;
+      }
+
+      SelectionController.selection.style.top =
+        SelectionController.intialTop - (scrollTop - SelectionController.intialScrollY) + 'px';
+      SelectionController.selection.style.height =
+        SelectionController.intialHeigth + (scrollTop - SelectionController.intialScrollY) + 'px';
+      // SelectionController.selection.style.height = height + 1 + 'px';
+    }
+  }
+
+  static intialScrollY = 0;
+  static intialHeigth = 0;
+  static intialTop = 0;
 }
 
 export { SelectionController };

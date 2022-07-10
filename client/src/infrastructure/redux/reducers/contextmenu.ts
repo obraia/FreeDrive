@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ContextMenuItem } from '../../../app/modules/shared/components/layout_components/contextmenu';
+import { ContextMenuItem } from '../../../app/modules/shared/components/layout/contextmenu';
 
 const stock = createSlice({
   name: 'contextmenu',
@@ -24,10 +24,12 @@ const stock = createSlice({
       state.items = action.payload.items;
     },
     hideMenu(state) {
-      state.isOpen = false;
-      state.xPos = 0;
-      state.yPos = 0;
-      state.items = [];
+      if (state.isOpen) {
+        state.isOpen = false;
+        state.xPos = 0;
+        state.yPos = 0;
+        state.items = [];
+      }
     },
   },
 });

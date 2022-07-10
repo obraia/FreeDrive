@@ -1,24 +1,24 @@
-import { Schema, model, Document } from 'mongoose';
-import { IFolder } from '../../folder/models/folder.model';
-import { IUser } from '../../user/models/user.model';
+import { Schema, model, Types } from 'mongoose'
+import { IFolder } from '../../folder/models/folder.model'
+import { IUser } from '../../user/models/user.model'
 
 interface IFile {
-  _id: string;
-  userId: string;
-  parentId: string;
-  fileName: string;
-  originalName: string;
-  size: number;
-  mimetype: string;
-  path: string;
-  favorite: Boolean;
-  deleted: Boolean;
-  createdAt: Date;
-  updatedAt?: Date;
-  deletedAt?: Date;
+  _id?: Types.ObjectId
+  userId: string
+  parentId: string
+  fileName: string
+  originalName: string
+  size: number
+  mimetype: string
+  path: string
+  favorite: Boolean
+  deleted: Boolean
+  createdAt: Date
+  updatedAt?: Date
+  deletedAt?: Date
 
-  user?: IUser;
-  parent?: IFolder;
+  user?: IUser
+  parent?: IFolder
 }
 
 const fileSchema = new Schema(
@@ -77,17 +77,17 @@ const fileSchema = new Schema(
     timestamps: true,
     toJSON: { virtuals: true, getters: true },
     toObject: { virtuals: true, getters: true },
-  }
-);
+  },
+)
 
 fileSchema.virtual('parent', {
   ref: 'folders',
   localField: 'parentId',
   foreignField: '_id',
   justOne: true,
-});
+})
 
-const FileModel = model<IFile>('files', fileSchema);
+const FileModel = model<IFile>('files', fileSchema)
 
-export { FileModel };
-export type { IFile };
+export { FileModel }
+export type { IFile }

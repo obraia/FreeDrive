@@ -1,23 +1,23 @@
-import { Schema, model } from 'mongoose';
-import { IFile } from '../../file/models/file.model';
-import { IUser } from '../../user/models/user.model';
+import { Schema, model, Types } from 'mongoose'
+import { FileModel, IFile } from '../../file/models/file.model'
+import { IUser } from '../../user/models/user.model'
 
 interface IFolder {
-  _id: string;
-  userId: string;
-  parentId: string;
-  folderName: string;
-  color: string;
-  favorite: Boolean;
-  deleted: Boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date;
+  _id: string
+  userId: string
+  parentId: string
+  folderName: string
+  color: string
+  favorite: Boolean
+  deleted: Boolean
+  createdAt: Date
+  updatedAt: Date
+  deletedAt: Date
 
-  user?: IUser;
-  parent?: IFolder;
-  children?: IFolder[];
-  files?: IFile[];
+  user?: IUser
+  parent?: IFolder
+  children?: IFolder[]
+  files?: IFile[]
 }
 
 const folderSchema = new Schema(
@@ -61,10 +61,29 @@ const folderSchema = new Schema(
     timestamps: true,
     toJSON: { virtuals: true, getters: true },
     toObject: { virtuals: true, getters: true },
-  }
-);
+  },
+)
 
-const FolderModel = model<IFolder>('folders', folderSchema);
+// middlerare update all children with a parentId of the folder
+// folderSchema.pre('updateMany', function (next) {
+//   const update = this.getUpdate();
+//   const updated = this.getQuery()._id;
 
-export { FolderModel };
-export type { IFolder };
+//   if (update && updated) {
+//     const { $set } = update as any;
+//     const { $in } = updated as any;
+
+//     console.log({ $in, $set });
+
+//     if ($set.deleted) {
+//       model('folders').updateMany({ parentId: { $in } }, { $set });
+//     }
+//   }
+
+//   next();
+// });
+
+const FolderModel = model<IFolder>('folders', folderSchema)
+
+export { FolderModel }
+export type { IFolder }

@@ -1,49 +1,57 @@
-import React, { Fragment, useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../../../infrastructure/redux/store';
-import { selectFiles, selectFolders } from '../../reducers/files.reducer';
-import { SelectionController } from './controller';
+import React, { Fragment, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '../../../../../infrastructure/redux/store'
+import { selectFiles, selectFolders } from '../../reducers/files.reducer'
+import { SelectionController } from './controller'
 
 export interface Props {
-  onFilesSelectionChange?: (ids: number[]) => void;
-  onFoldersSelectionChange?: (ids: number[]) => void;
+  children: React.ReactNode
+  containerId: string
+  onFilesSelectionChange?: (ids: number[]) => void
+  onFoldersSelectionChange?: (ids: number[]) => void
 }
 
 const Selection: React.FC<Props> = (props) => {
-  const { theme } = useSelector((state: RootState) => state.theme);
-  const dispatch = useDispatch();
-
-  const ref = useRef(null);
-  const childrenRef = React.cloneElement(props.children as any, { ref });
+  const { theme } = useSelector((state: RootState) => state.theme)
+  const { files, folders } = useSelector((state: RootState) => state.files)
+  const dispatch = useDispatch()
 
   const handleSelectFiles = (ids: string[]) => {
-    dispatch(selectFiles({ ids }));
-  };
+    dispatch(selectFiles({ ids }))
+  }
 
   const handleSelectFolders = (ids: string[]) => {
-    dispatch(selectFolders({ ids }));
-  };
+    dispatch(selectFolders({ ids }))
+  }
 
   useEffect(() => {
-    const files = Array.from(document.querySelectorAll(`[id^="file_"]`));
-    const folders = Array.from(document.querySelectorAll(`[id^="folder_"]`));
+    if (!props.containerId) return
+
+    const container = document.getElementById(props.containerId)
+
+    if (!container) return
+
+    const files = Array.from(container.querySelectorAll(`[id^="file_"]`))
+    const folders = Array.from(container.querySelectorAll(`[id^="folder_"]`))
+
+    if (!files || !folders) return
 
     const controller = new SelectionController({
-      container: ref.current!,
-      files: files,
-      folders: folders,
+      container,
+      files,
+      folders,
       mode: 'LOOSE',
       color: theme.colors.primary,
       onFilesSelectionChange: handleSelectFiles,
       onFoldersSelectionChange: handleSelectFolders,
-    });
+    })
 
     return () => {
-      controller.destroy();
-    };
-  });
+      controller.destroy()
+    }
+  }, [props.containerId, files, folders])
 
-  return <Fragment>{childrenRef}</Fragment>;
-};
+  return <Fragment>{props.children}</Fragment>
+}
 
-export { Selection };
+export { Selection }

@@ -82,6 +82,14 @@ class FolderRepository extends BaseRepository<IFolder> {
     ]);
   }
 
+  async move(ids: string[], parentId: string) {
+    return await this.model.updateMany({ _id: { $in: ids } }, { $set: { parentId } });
+  }
+
+  async rename(id: string, folderName: string) {
+    return await this.model.updateOne({ _id: id }, { $set: { folderName } });
+  }
+
   async favorite(ids: string[], favorite: boolean) {
     return await this.model.updateMany({ _id: { $in: ids } }, [{ $set: { favorite } }]);
   }
