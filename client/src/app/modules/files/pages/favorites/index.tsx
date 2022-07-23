@@ -6,14 +6,17 @@ import { FilesSection } from '../../components/files'
 import { FoldersSection } from '../../components/folders'
 import { useFavoritesPageController } from './controller'
 import { Container } from './styles'
+import { useSelector } from 'react-redux'
+import { RootState } from '../../../../../infrastructure/redux/store'
 
 const FavoritesPage: React.FC = () => {
   const containerId = 'favorites-page'
-  const userId = '62ba0237ca20daae241e8737'
+
+  const {
+    user: { id: userId },
+  } = useSelector((state: RootState) => state.profile)
 
   useFavoritesPageController({ userId, containerId })
-
-  console.log('[Render] FavoritesPage')
 
   return (
     <Selection containerId={containerId}>

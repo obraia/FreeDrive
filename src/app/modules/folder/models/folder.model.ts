@@ -1,24 +1,5 @@
-import { Schema, model, Types } from 'mongoose'
-import { FileModel, IFile } from '../../file/models/file.model'
-import { IUser } from '../../user/models/user.model'
-
-interface IFolder {
-  _id: string
-  userId: string
-  parentId: string
-  folderName: string
-  color: string
-  favorite: Boolean
-  deleted: Boolean
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
-
-  user?: IUser
-  parent?: IFolder
-  children?: IFolder[]
-  files?: IFile[]
-}
+import { Schema, model } from 'mongoose'
+import { IFolder } from './folder.interface'
 
 const folderSchema = new Schema(
   {
@@ -56,6 +37,10 @@ const folderSchema = new Schema(
     deletedAt: {
       type: Date,
     },
+    allowDuplicate: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
@@ -64,26 +49,6 @@ const folderSchema = new Schema(
   },
 )
 
-// middlerare update all children with a parentId of the folder
-// folderSchema.pre('updateMany', function (next) {
-//   const update = this.getUpdate();
-//   const updated = this.getQuery()._id;
-
-//   if (update && updated) {
-//     const { $set } = update as any;
-//     const { $in } = updated as any;
-
-//     console.log({ $in, $set });
-
-//     if ($set.deleted) {
-//       model('folders').updateMany({ parentId: { $in } }, { $set });
-//     }
-//   }
-
-//   next();
-// });
-
 const FolderModel = model<IFolder>('folders', folderSchema)
 
 export { FolderModel }
-export type { IFolder }

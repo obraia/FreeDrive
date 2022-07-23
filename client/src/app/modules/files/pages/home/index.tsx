@@ -9,13 +9,18 @@ import { NewFolder } from '../../components/folders/new'
 import { useHomePageController } from './controller'
 import { Container } from './styles'
 import { useInfinityScroll } from '../../../shared/hooks/useInfinityScroll'
+import { RootState } from '../../../../../infrastructure/redux/store'
+import { useSelector } from 'react-redux'
 
 const HomePage: React.FC = () => {
   const containerId = 'home-page'
   const uploaderId = 'home-page-uploader'
-  const scrollControlId = 'home-page-scroll-control'
-  const userId = '62ba0237ca20daae241e8737'
-  const { id: parentId = '62bbc4d7edf858e4c6a9b98a' } = useParams()
+
+  const {
+    user: { id: userId, driveFolder },
+  } = useSelector((state: RootState) => state.profile)
+
+  const { id: parentId = driveFolder.id } = useParams()
 
   const {
     newFolderModalVisible,
@@ -24,9 +29,8 @@ const HomePage: React.FC = () => {
     handleContextMenu,
   } = useHomePageController({ parentId, userId, containerId, uploaderId })
 
-  const { limit, page } = useInfinityScroll({
-    controlId: 'home-page-scroll-control',
-    initialLimit: 30,
+  const { limit, page, handleScroll } = useInfinityScroll({
+    initialLimit: 40,
   })
 
   const renderNewFolder = () => {
@@ -37,18 +41,18 @@ const HomePage: React.FC = () => {
     )
   }
 
-  console.log({ limit, page })
-
   return (
     <Selection containerId={containerId}>
       <DndProvider backend={HTML5Backend}>
         <Container id={containerId} onContextMenu={handleContextMenu}>
           <FoldersSection
+            key={'folders'}
             deleted={false}
             parentId={parentId}
             contextMenuItems={['FAVORITE', 'DOWNLOAD', 'INFO', 'RENAME', 'TRASH']}
           />
           <FilesSection
+            key={'files'}
             deleted={false}
             parentId={parentId}
             limit={limit}
@@ -57,7 +61,7 @@ const HomePage: React.FC = () => {
           />
           {renderNewFolder()}
           <input id={uploaderId} title="files" type="file" />
-          <div id={scrollControlId} />
+          {/* <Loading /> */}
         </Container>
       </DndProvider>
     </Selection>

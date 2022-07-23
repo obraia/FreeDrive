@@ -1,34 +1,38 @@
-import { Request, Response } from 'express';
-import { httpStatusCode } from '../../../utils/helpers/httpStatus.helper';
-import { UserRepository } from '../repositories/user.repository';
+import { Request, Response } from 'express'
+import { Types } from 'mongoose'
+import { BaseController } from '../../shared/controllers/base.controller'
+import { UserRepository } from '../repositories/user.repository'
+import { IUser } from '../models/user.interface'
+import { BadRequestException } from '../../shared/exceptions/badRequest.exception'
+import { NotfoundException } from '../../shared/exceptions/notfound.exception'
 
-class UserController {
-  private _repository: UserRepository;
-
+class UserController extends BaseController<IUser> {
   constructor() {
-    this._repository = new UserRepository();
+    super(new UserRepository())
   }
 
-  public async create(req: Request, res: Response): Promise<Response | undefined> {
-    const { body } = req;
+  public async findById(req: Request, res: Response) {
+    const { id } = req.params
 
     try {
-      const mongoSchema = {
-        name: body.name,
-        email: body.email,
-        username: body.username,
-        password: body.password,
-      };
+      if (!Types.ObjectId.isValid(id)) {
+        throw new BadRequestException('Invalid id')
+      }
 
-      await this._repository.create(mongoSchema);
+      const result = await this.repository.findById(id, [
+        'driveFolder',
+        'staticFolder',
+      ])
 
-      return res.status(httpStatusCode.OK).json({ message: 'User created successfully' });
-    } catch (e: any) {
-      res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({
-        error: e.message,
-      });
+      if (!result) {
+        throw new NotfoundException('Not found')
+      }
+
+      return this.sendSuccess(res, result)
+    } catch (error: any) {
+      this.sendError(res, error)
     }
   }
 }
 
-export { UserController };
+export { UserController }

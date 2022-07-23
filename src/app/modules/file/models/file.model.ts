@@ -1,25 +1,5 @@
-import { Schema, model, Types } from 'mongoose'
-import { IFolder } from '../../folder/models/folder.model'
-import { IUser } from '../../user/models/user.model'
-
-interface IFile {
-  _id?: Types.ObjectId
-  userId: string
-  parentId: string
-  fileName: string
-  originalName: string
-  size: number
-  mimetype: string
-  path: string
-  favorite: Boolean
-  deleted: Boolean
-  createdAt: Date
-  updatedAt?: Date
-  deletedAt?: Date
-
-  user?: IUser
-  parent?: IFolder
-}
+import { Schema, model } from 'mongoose'
+import { IFile } from './file.interface'
 
 const fileSchema = new Schema(
   {
@@ -90,4 +70,3 @@ fileSchema.virtual('parent', {
 const FileModel = model<IFile>('files', fileSchema)
 
 export { FileModel }
-export type { IFile }

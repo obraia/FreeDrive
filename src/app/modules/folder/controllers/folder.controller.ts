@@ -8,7 +8,7 @@ import { BaseController } from '../../shared/controllers/base.controller'
 import { FolderRepository } from '../repositories/folder.repository'
 import { BadRequestException } from '../../shared/exceptions/badRequest.exception'
 import { NotfoundException } from '../../shared/exceptions/notfound.exception'
-import { IFolder } from '../models/folder.model'
+import { IFolder } from '../models/folder.interface'
 
 @boundClass
 class FolderController extends BaseController<IFolder> {
@@ -174,9 +174,7 @@ class FolderController extends BaseController<IFolder> {
       }
 
       if (
-        folders.every(
-          (f: any) => f.children.length === 0 && f.files.length === 0,
-        )
+        folders.every((f: any) => f.children.length === 0 && f.files.length === 0)
       ) {
         throw new BadRequestException('No files to download')
       }

@@ -28,8 +28,6 @@ const FilesSection: React.FC<FilesSectionProps> = (props) => {
     handleRename,
   } = useFileSectionController(props)
 
-  console.log('[Render] FilesSection')
-
   useDrag({
     type: ItemTypes.FILE,
     item: {
@@ -53,15 +51,20 @@ const FilesSection: React.FC<FilesSectionProps> = (props) => {
   }
 
   const renderRename = () => {
+    if (!rename?.visible || !rename.file) return null
+
+    const parts = rename.file.originalName.split('.')
+    const extension = parts.pop()
+    const name = parts.join('.')
+
     return (
-      rename?.visible && (
-        <Rename
-          title="Renomear arquivo"
-          initialValue={rename.file?.originalName}
-          onClose={toggleRename}
-          onRename={handleRename}
-        />
-      )
+      <Rename
+        title="Renomear arquivo"
+        initialValue={rename.file?.originalName}
+        selectionRange={[0, name.length]}
+        onClose={toggleRename}
+        onRename={handleRename}
+      />
     )
   }
 

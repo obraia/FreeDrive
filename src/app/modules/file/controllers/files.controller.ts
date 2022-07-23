@@ -8,7 +8,7 @@ import { BaseController } from '../../shared/controllers/base.controller'
 import { FileRepository } from '../repositories/file.repository'
 import { BadRequestException } from '../../shared/exceptions/badRequest.exception'
 import { NotfoundException } from '../../shared/exceptions/notfound.exception'
-import { IFile } from '../models/file.model'
+import { IFile } from '../models/file.interface'
 
 @boundClass
 class FilesController extends BaseController<IFile> {

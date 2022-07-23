@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { TbFile, TbFolder, TbFolderPlus, TbInfoCircle } from 'react-icons/tb'
+
 import { FileService } from '../../../../../infrastructure/services/file/file.service'
 import { FolderService } from '../../../../../infrastructure/services/folder/folder.service'
+
 import {
   addFiles,
   addFolders,
@@ -13,6 +15,7 @@ import {
   hideMenu,
   showMenu,
 } from '../../../../../infrastructure/redux/reducers/contextmenu'
+
 import { setPage } from '../../../../../infrastructure/redux/reducers/pages'
 import { getSequencePaths } from '../../../shared/utils/formatters/paths.formatter'
 
@@ -124,10 +127,6 @@ function useHomePageController(props: Props) {
     formData.append('userId', props.userId)
     formData.append('parentId', props.parentId)
 
-    for (let i = 0; i < files.length; i++) {
-      formData.append('files', files[i])
-    }
-
     fileService.upload(formData).then((data) => {
       dispatch(addFiles(data))
     })
@@ -146,7 +145,7 @@ function useHomePageController(props: Props) {
     toggleNewFolderModal()
   }
 
-  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleContextMenu = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.preventDefault()
 
     clearSelection()
@@ -197,6 +196,7 @@ function useHomePageController(props: Props) {
     handleNewFolder,
     handleContextMenu,
     handleUpload,
+
     contextItems,
     showContextMenu,
     hideContextMenu,

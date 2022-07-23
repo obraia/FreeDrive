@@ -1,24 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { TbFile, TbFolder, TbFolderPlus, TbInfoCircle } from 'react-icons/tb'
-import { FileService } from '../../../../../infrastructure/services/file/file.service'
-import { FolderService } from '../../../../../infrastructure/services/folder/folder.service'
-import {
-  addFiles,
-  addFolders,
-  clearAllSelections,
-} from '../../reducers/files.reducer'
+import { TbFolder, TbInfoCircle } from 'react-icons/tb'
+import { clearAllSelections } from '../../reducers/files.reducer'
 
 import {
   hideMenu,
   showMenu,
 } from '../../../../../infrastructure/redux/reducers/contextmenu'
 import { setPage } from '../../../../../infrastructure/redux/reducers/pages'
-import { getSequencePaths } from '../../../shared/utils/formatters/paths.formatter'
 
 interface Props {
   userId: string
-  parentId: string
   containerId: string
 }
 
@@ -26,9 +18,6 @@ function useTrashPageController(props: Props) {
   const [newFolderModalVisible, setNewFolderModalVisible] = useState(false)
 
   const dispatch = useDispatch()
-
-  const fileService = new FileService()
-  const folderService = new FolderService()
 
   const contextItems = () => {
     return [
@@ -94,39 +83,7 @@ function useTrashPageController(props: Props) {
     uploader.click()
   }
 
-  const handleUpload = async (e: Event) => {
-    const files = (e.target as HTMLInputElement).files
-
-    if (!files) return
-
-    const formData = new FormData()
-
-    formData.append('userId', props.userId)
-    formData.append('parentId', props.parentId)
-
-    for (let i = 0; i < files.length; i++) {
-      formData.append('files', files[i])
-    }
-
-    fileService.uploadStatic(formData).then((data) => {
-      dispatch(addFiles(data))
-    })
-  }
-
-  const handleNewFolder = (folderName: string) => {
-    const formData = new FormData()
-    formData.append('folderName', folderName)
-    formData.append('parentId', props.parentId)
-    formData.append('userId', props.userId)
-
-    folderService.createFolder(formData).then((data) => {
-      dispatch(addFolders([data]))
-    })
-
-    toggleNewFolderModal()
-  }
-
-  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleContextMenu = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.preventDefault()
 
     clearSelection()
@@ -138,20 +95,6 @@ function useTrashPageController(props: Props) {
     })
   }
 
-  const bindEvents = () => {
-    const container = document.getElementById(props.containerId)
-    const uploader = document.getElementById('uploader')
-    container?.addEventListener('mousedown', clearSelection)
-    uploader?.addEventListener('change', handleUpload)
-  }
-
-  const unbindEvents = () => {
-    const container = document.getElementById(props.containerId)
-    const uploader = document.getElementById('uploader')
-    container?.removeEventListener('mousedown', clearSelection)
-    uploader?.removeEventListener('change', handleUpload)
-  }
-
   useEffect(() => {
     dispatch(
       setPage({
@@ -161,10 +104,7 @@ function useTrashPageController(props: Props) {
       }),
     )
 
-    bindEvents()
-
     return () => {
-      unbindEvents()
       dispatch(clearAllSelections())
     }
   }, [])
@@ -172,9 +112,7 @@ function useTrashPageController(props: Props) {
   return {
     newFolderModalVisible,
     toggleNewFolderModal,
-    handleNewFolder,
     handleContextMenu,
-    handleUpload,
     contextItems,
     showContextMenu,
     hideContextMenu,

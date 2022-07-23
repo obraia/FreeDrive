@@ -8,24 +8,46 @@ import { FoldersSection } from '../../components/folders'
 import { NewFolder } from '../../components/folders/new'
 import { useStaticPageController } from './controller'
 import { Container } from './styles'
+import { RootState } from '../../../../../infrastructure/redux/store'
+import { useSelector } from 'react-redux'
+import { ReplaceFiles } from '../../components/files/replace'
 
 const StaticPage: React.FC = () => {
   const containerId = 'static-page'
   const uploaderId = 'home-page-uploader'
-  const userId = '62ba0237ca20daae241e8737'
-  const { id: parentId = '62c8c139b15f09e152aeeee2' } = useParams()
+
+  const {
+    user: { id: userId, staticFolder },
+  } = useSelector((state: RootState) => state.profile)
+
+  const { id: parentId = staticFolder.id } = useParams()
 
   const {
     newFolderModalVisible,
     toggleNewFolderModal,
     handleNewFolder,
     handleContextMenu,
+    handleReplace,
+    clearReplaceFiles,
+    replaceFiles,
   } = useStaticPageController({ parentId, userId, containerId, uploaderId })
 
   const renderNewFolder = () => {
     return (
       newFolderModalVisible && (
         <NewFolder onClose={toggleNewFolderModal} onCreate={handleNewFolder} />
+      )
+    )
+  }
+
+  const renderReplaceFile = () => {
+    return (
+      Boolean(replaceFiles.length) && (
+        <ReplaceFiles
+          files={replaceFiles as File[]}
+          onClose={clearReplaceFiles}
+          onReplace={handleReplace}
+        />
       )
     )
   }
@@ -47,6 +69,7 @@ const StaticPage: React.FC = () => {
             contextMenuItems={['LINK', 'DOWNLOAD', 'INFO', 'RENAME', 'TRASH']}
           />
           {renderNewFolder()}
+          {renderReplaceFile()}
           <input id={uploaderId} title="files" type="file" />
         </Container>
       </DndProvider>

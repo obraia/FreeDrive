@@ -32,7 +32,7 @@ const stock = createSlice({
       state.folders = action.payload
     },
     addFiles: (state, action: PayloadAction<IFileChild[]>) => {
-      state.files.push(...action.payload)
+      state.files = [...state.files, ...action.payload]
     },
     addFolders: (state, action: PayloadAction<IFolderChild[]>) => {
       state.folders.push(...action.payload)
@@ -41,7 +41,9 @@ const stock = createSlice({
       state.files = []
     },
     clearFolders: (state) => {
-      state.folders = []
+      if (state.folders.length) {
+        state.folders = []
+      }
     },
     selectFiles(state, action: PayloadAction<{ ids: string[] }>) {
       state.selectedFiles = action.payload.ids
@@ -56,13 +58,13 @@ const stock = createSlice({
       state.selectedFolders = []
     },
     clearAllSelections(state) {
-      if (state.selectedFiles.length > 0) {
+      if (state.selectedFiles.length) {
         state.selectedFiles = []
       }
-      if (state.selectedFolders.length > 0) {
+      if (state.selectedFolders.length) {
         state.selectedFolders = []
       }
-      if (state.contextMenuItems.length > 0) {
+      if (state.contextMenuItems.length) {
         state.contextMenuItems = []
       }
     },

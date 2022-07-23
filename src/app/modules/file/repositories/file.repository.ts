@@ -1,6 +1,7 @@
 import { Types } from 'mongoose'
 import { BaseRepository } from '../../shared/repositories/base.repository'
-import { FileModel, IFile } from '../models/file.model'
+import { IFile } from '../models/file.interface'
+import { FileModel } from '../models/file.model'
 
 class FileRepository extends BaseRepository<IFile> {
   constructor() {
@@ -14,10 +15,7 @@ class FileRepository extends BaseRepository<IFile> {
   }
 
   async move(ids: string[], parentId: string) {
-    return await this.model.updateMany(
-      { _id: { $in: ids } },
-      { $set: { parentId } },
-    )
+    return await this.model.updateMany({ _id: { $in: ids } }, { $set: { parentId } })
   }
 
   async copy(file: IFile[], parentId: string) {

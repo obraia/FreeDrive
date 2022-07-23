@@ -60,8 +60,10 @@ interface Raname {
 
 function useFolderSectionController(props: Props) {
   const [rename, setRename] = useState<Raname>({ visible: false, folder: null })
+
   const { selectedFolders, folders } = useSelector((state: RootState) => state.files)
   const { current: currentPage } = useSelector((state: RootState) => state.pages)
+
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -309,7 +311,9 @@ function useFolderSectionController(props: Props) {
         favorite: props.favorite,
       })
       .then((data) => {
-        dispatch(setFolders(data))
+        if (data.length) {
+          dispatch(setFolders(data))
+        }
       })
       .catch((err) => {
         console.error(err)

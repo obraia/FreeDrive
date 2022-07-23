@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 import { TbFile, TbFolder, TbFolderPlus, TbInfoCircle } from 'react-icons/tb'
 import { FileService } from '../../../../../infrastructure/services/file/file.service'
 import { FolderService } from '../../../../../infrastructure/services/folder/folder.service'
+
 import {
   addFiles,
   addFolders,
@@ -13,6 +14,7 @@ import {
   hideMenu,
   showMenu,
 } from '../../../../../infrastructure/redux/reducers/contextmenu'
+
 import { setPage } from '../../../../../infrastructure/redux/reducers/pages'
 import { getSequencePaths } from '../../../shared/utils/formatters/paths.formatter'
 
@@ -24,6 +26,7 @@ interface Props {
 }
 
 function useStaticPageController(props: Props) {
+  const [replaceFiles, setReplaceFiles] = useState<File[]>([])
   const [newFolderModalVisible, setNewFolderModalVisible] = useState(false)
 
   const dispatch = useDispatch()
@@ -126,11 +129,12 @@ function useStaticPageController(props: Props) {
 
     for (let i = 0; i < files.length; i++) {
       formData.append('files', files[i])
+      setReplaceFiles((value) => [...value, files[i]])
     }
 
-    fileService.uploadStatic(formData).then((data) => {
-      dispatch(addFiles(data))
-    })
+    // fileService.uploadStatic(formData).then((data) => {
+    //   dispatch(addFiles(data))
+    // })
   }
 
   const handleNewFolder = (folderName: string) => {
@@ -146,7 +150,16 @@ function useStaticPageController(props: Props) {
     toggleNewFolderModal()
   }
 
-  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleReplace = (fileName: string) => {
+    setReplaceFiles((files) => files.slice(1))
+    console.log(fileName + ' substituido')
+  }
+
+  const clearReplaceFiles = () => {
+    setReplaceFiles([])
+  }
+
+  const handleContextMenu = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.preventDefault()
 
     clearSelection()
@@ -201,6 +214,9 @@ function useStaticPageController(props: Props) {
     showContextMenu,
     hideContextMenu,
     callUpload,
+    handleReplace,
+    clearReplaceFiles,
+    replaceFiles,
   }
 }
 

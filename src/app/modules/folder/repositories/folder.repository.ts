@@ -1,10 +1,11 @@
-import { Types } from 'mongoose';
-import { BaseRepository } from '../../shared/repositories/base.repository';
-import { FolderModel, IFolder } from '../models/folder.model';
+import { Types } from 'mongoose'
+import { BaseRepository } from '../../shared/repositories/base.repository'
+import { FolderModel } from '../models/folder.model'
+import { IFolder } from '../models/folder.interface'
 
 class FolderRepository extends BaseRepository<IFolder> {
   constructor() {
-    super(FolderModel);
+    super(FolderModel)
   }
 
   async findDeepById(id: string, params: any): Promise<any> {
@@ -50,7 +51,7 @@ class FolderRepository extends BaseRepository<IFolder> {
           depthField: 'depth',
         },
       },
-    ]);
+    ])
   }
 
   async findDeepChildren(ids: Types.ObjectId[]): Promise<any> {
@@ -61,7 +62,12 @@ class FolderRepository extends BaseRepository<IFolder> {
           from: 'folders',
           let: { folderId: '$_id' },
           pipeline: [
-            { $match: { $expr: { $eq: ['$parentId', '$$folderId'] }, deleted: false } },
+            {
+              $match: {
+                $expr: { $eq: ['$parentId', '$$folderId'] },
+                deleted: false,
+              },
+            },
             { $project: { _id: 1, folderName: 1 } },
           ],
           as: 'children',
@@ -72,31 +78,41 @@ class FolderRepository extends BaseRepository<IFolder> {
           from: 'files',
           let: { folderId: '$_id' },
           pipeline: [
-            { $match: { $expr: { $eq: ['$parentId', '$$folderId'] }, deleted: false } },
+            {
+              $match: {
+                $expr: { $eq: ['$parentId', '$$folderId'] },
+                deleted: false,
+              },
+            },
             { $project: { originalName: 1, path: 1 } },
           ],
           as: 'files',
         },
       },
       { $project: { folderName: 1, children: 1, files: 1 } },
-    ]);
+    ])
   }
 
   async move(ids: string[], parentId: string) {
-    return await this.model.updateMany({ _id: { $in: ids } }, { $set: { parentId } });
+    return await this.model.updateMany({ _id: { $in: ids } }, { $set: { parentId } })
   }
 
   async rename(id: string, folderName: string) {
-    return await this.model.updateOne({ _id: id }, { $set: { folderName } });
+    return await this.model.updateOne({ _id: id }, { $set: { folderName } })
   }
 
   async favorite(ids: string[], favorite: boolean) {
-    return await this.model.updateMany({ _id: { $in: ids } }, [{ $set: { favorite } }]);
+    return await this.model.updateMany({ _id: { $in: ids } }, [
+      { $set: { favorite } },
+    ])
   }
 
   async moveToTrash(ids: string[]) {
-    return await this.model.updateMany({ _id: { $in: ids } }, { $set: { deleted: true } });
+    return await this.model.updateMany(
+      { _id: { $in: ids } },
+      { $set: { deleted: true } },
+    )
   }
 }
 
-export { FolderRepository };
+export { FolderRepository }

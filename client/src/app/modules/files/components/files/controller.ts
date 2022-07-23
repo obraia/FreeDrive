@@ -52,12 +52,12 @@ interface Raname {
   file: IFileChild | null
 }
 
-function useFileSectionController(props: FilesSectionProps) {
+const useFileSectionController = (props: FilesSectionProps) => {
   const [rename, setRename] = useState<Raname>({ visible: false, file: null })
 
   const { selectedFiles, files } = useSelector((state: RootState) => state.files)
-  const dispatch = useDispatch()
 
+  const dispatch = useDispatch()
   const service = new FileService()
 
   const contextMenuItems = (file: Partial<IFileChild>) => [
@@ -317,7 +317,10 @@ function useFileSectionController(props: FilesSectionProps) {
         page: props.page,
       })
       .then((data) => {
-        dispatch(addFiles(data))
+        if (data.length) {
+          const newFiles = props.page > 1 ? [...files, ...data] : data
+          dispatch(setFiles(newFiles))
+        }
       })
       .catch((err) => {
         console.error(err)
