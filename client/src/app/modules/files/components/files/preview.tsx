@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { TbFile } from 'react-icons/tb'
-import { IFileChild } from '../../../../../infrastructure/services/folder/interfaces'
+import { IFile } from '../../../../../infrastructure/services/file/file.service.d'
 
 export interface Props {
-  file: IFileChild
+  file: IFile
 }
 
 const Preview: React.FC<Props> = (props) => {
@@ -17,7 +17,7 @@ const Preview: React.FC<Props> = (props) => {
       pdf: <iframe src={src} title="pdf" />,
     }[type])
 
-  const handleFileType = (file: IFileChild) => {
+  const handleFileType = (file: IFile) => {
     if (file.mimetype.includes('image')) {
       setType('image')
     } else if (file.mimetype.includes('video')) {

@@ -1,11 +1,13 @@
 import { Request, Response } from 'express'
 import { Types } from 'mongoose'
+import { boundClass } from 'autobind-decorator'
 import { BaseController } from '../../shared/controllers/base.controller'
 import { UserRepository } from '../repositories/user.repository'
 import { IUser } from '../models/user.interface'
 import { BadRequestException } from '../../shared/exceptions/badRequest.exception'
 import { NotfoundException } from '../../shared/exceptions/notfound.exception'
 
+@boundClass
 class UserController extends BaseController<IUser> {
   constructor() {
     super(new UserRepository())
@@ -20,6 +22,29 @@ class UserController extends BaseController<IUser> {
       }
 
       const result = await this.repository.findById(id, [
+        'driveFolder',
+        'staticFolder',
+      ])
+
+      if (!result) {
+        throw new NotfoundException('Not found')
+      }
+
+      return this.sendSuccess(res, result)
+    } catch (error: any) {
+      this.sendError(res, error)
+    }
+  }
+
+  public async findCurrent(req: Request, res: Response) {
+    const { decoded } = req
+
+    try {
+      if (!decoded) {
+        throw new BadRequestException('User cannot be decoded')
+      }
+
+      const result = await this.repository.findById(decoded.id, [
         'driveFolder',
         'staticFolder',
       ])

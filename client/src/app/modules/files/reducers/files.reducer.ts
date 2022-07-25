@@ -1,13 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import {
-  IFileChild,
-  IFolderChild,
-} from '../../../../infrastructure/services/folder/interfaces'
+import { IFile } from '../../../../infrastructure/services/file/file.service.d'
+import { IFolder } from '../../../../infrastructure/services/folder/folder.service.d'
 import { ContextMenuItem } from '../../shared/components/layout/contextmenu'
 
 export interface FilesState {
-  files: IFileChild[]
-  folders: IFolderChild[]
+  files: IFile[]
+  folders: IFolder[]
   selectedFiles: string[]
   selectedFolders: string[]
   contextMenuItems: ContextMenuItem[]
@@ -25,16 +23,16 @@ const stock = createSlice({
   name: 'Files',
   initialState,
   reducers: {
-    setFiles: (state, action: PayloadAction<IFileChild[]>) => {
+    setFiles: (state, action: PayloadAction<IFile[]>) => {
       state.files = action.payload
     },
-    setFolders: (state, action: PayloadAction<IFolderChild[]>) => {
+    setFolders: (state, action: PayloadAction<IFolder[]>) => {
       state.folders = action.payload
     },
-    addFiles: (state, action: PayloadAction<IFileChild[]>) => {
+    addFiles: (state, action: PayloadAction<IFile[]>) => {
       state.files = [...state.files, ...action.payload]
     },
-    addFolders: (state, action: PayloadAction<IFolderChild[]>) => {
+    addFolders: (state, action: PayloadAction<IFolder[]>) => {
       state.folders.push(...action.payload)
     },
     clearFiles: (state) => {

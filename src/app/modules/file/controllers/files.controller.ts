@@ -33,6 +33,10 @@ class FilesController extends BaseController<IFile> {
       params.favorite = favorite === 'true'
     }
 
+    if (req.decoded) {
+      params.userId = req.decoded.id
+    }
+
     try {
       const result = await this.repository.find(params, Number(limit), Number(page))
 
@@ -46,18 +50,22 @@ class FilesController extends BaseController<IFile> {
     req: Request,
     res: Response,
   ): Promise<Response | undefined> {
-    const { files, body } = req
+    const { files, body, decoded } = req
 
     try {
       if (!(files instanceof Array)) {
         throw new BadRequestException('Invalid files')
       }
 
+      if (!decoded) {
+        throw new BadRequestException('Invalid decoded')
+      }
+
       const filesMongo = files.map((file) =>
         this.repository.createDocument({
           _id: new Types.ObjectId(file.filename),
           fileName: file.filename,
-          userId: body.userId,
+          userId: decoded.id,
           parentId: body.parentId,
           originalName: file.originalname,
           mimetype: file.mimetype,

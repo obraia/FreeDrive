@@ -6,17 +6,11 @@ import { FilesSection } from '../../components/files'
 import { FoldersSection } from '../../components/folders'
 import { useTrashPageController } from './controller'
 import { Container } from './styles'
-import { useSelector } from 'react-redux'
-import { RootState } from '../../../../../infrastructure/redux/store'
 
 const TrashPage: React.FC = () => {
   const containerId = 'trash-page'
 
-  const {
-    user: { id: userId },
-  } = useSelector((state: RootState) => state.profile)
-
-  const { handleContextMenu } = useTrashPageController({ userId, containerId })
+  const { handleContextMenu } = useTrashPageController({ containerId })
 
   return (
     <Selection containerId={containerId}>

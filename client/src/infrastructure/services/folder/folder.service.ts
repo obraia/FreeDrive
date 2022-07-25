@@ -1,192 +1,115 @@
-import axios, { AxiosInstance } from 'axios'
-import { IFolder, IFolderChild } from './interfaces'
+import { useAxios } from '../../../app/modules/shared/hooks/useAxios'
+
+import {
+  IGetFoldersParams,
+  IGetFoldersResponse,
+  IGetFolderByIdResponse,
+  ICreateFolderResponse,
+  IDownloadFolderResponse,
+  IDeleteResponse,
+  IFavoriteResponse,
+  IMoveResponse,
+  IMoveToTrashResponse,
+  IRenameResponse,
+} from './folder.service.d'
 
 export interface Disk {
   total: number
   used: number
 }
 
-interface Params {
-  parentId?: string
-  favorite?: boolean
-  deleted?: boolean
-}
+const useFolderService = () => {
+  const axios = useAxios()
 
-class FolderService {
-  private api: AxiosInstance
-  private url: string
+  const getFolders = async (params: IGetFoldersParams) => {
+    const { data } = await axios.get<IGetFoldersResponse>('/folders', { params })
+    return data
+  }
 
-  constructor() {
-    this.url = 'http://localhost:3003/api'
+  const getFolderById = async (id: string, params?: IGetFoldersParams) => {
+    const { data } = await axios.get<IGetFolderByIdResponse>(`/folders/deep/${id}`, {
+      params,
+    })
+    return data
+  }
 
-    this.api = axios.create({
-      baseURL: this.url,
-      headers: {
-        'Content-Type': 'application/json',
+  const createFolder = async (formData: FormData) => {
+    const { data } = await axios.post<ICreateFolderResponse>('/folders', formData)
+    return data
+  }
+
+  const uploadFolders = async (formData: FormData) => {
+    const { data } = await axios.post<IGetFoldersResponse>('/folders', formData)
+    return data
+  }
+
+  const downloadFolders = async (ids: string[]) => {
+    const { data, headers } = await axios.get<IDownloadFolderResponse>(
+      `/folders/download`,
+      {
+        params: { ids },
+        responseType: 'blob',
       },
-    })
+    )
+
+    return { data, originalName: headers['file-name'] }
   }
 
-  public async getFolders(params?: Params): Promise<IFolderChild[]> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .get(`/folders/`, { params })
-        .then((response) => {
-          resolve(response.data)
-        })
-        .catch((error) => {
-          reject(error)
-        })
+  const favoriteFolders = async (ids: string[], favorite: boolean) => {
+    const { data } = await axios.patch<IFavoriteResponse>('/folders/favorite', {
+      ids,
+      favorite,
     })
+    return data
   }
 
-  public async getFolderById(id: string, params?: Params): Promise<IFolder> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .get(`/folders/deep/${id}`, { params })
-        .then((response) => {
-          resolve(response.data)
-        })
-        .catch((error) => {
-          reject(error)
-        })
+  const moveFoldersToTrash = async (ids: string[]) => {
+    const { data } = await axios.patch<IMoveToTrashResponse>('/folders/trash', {
+      ids,
     })
+    return data
   }
 
-  public async createFolder(formData: FormData): Promise<IFolderChild> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .post(`/folders/`, formData)
-        .then((response) => {
-          resolve(response.data)
-        })
-        .catch((error) => {
-          reject(error)
-        })
+  const renameFolder = async (id: string, folderName: string) => {
+    const { data } = await axios.patch<IRenameResponse>(`/folders/rename/${id}`, {
+      folderName,
     })
+    return data
   }
 
-  public async uploadFolders(formData: FormData): Promise<IFolderChild[]> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .post(`/folders/`, formData)
-        .then((response) => {
-          resolve(response.data)
-        })
-        .catch((error) => {
-          reject(error)
-        })
+  const moveFolders = async (ids: string[], parentId: string) => {
+    const { data } = await axios.patch<IMoveResponse>('/folders/move', {
+      ids,
+      parentId,
     })
+    return data
   }
 
-  public async download(
-    ids: string[],
-  ): Promise<{ data: any; originalName: string }> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .get(`/folders/download`, { params: { ids }, responseType: 'blob' })
-        .then((response) => {
-          resolve({
-            data: response.data,
-            originalName: response.headers['file-name'],
-          })
-        })
-        .catch((error) => {
-          reject(error)
-        })
+  const deleteFolders = async (ids: string[]) => {
+    const { data } = await axios.delete<IDeleteResponse>('/folders', {
+      params: { ids },
     })
+    return data
   }
 
-  public async favorite(
-    ids: string[],
-    favorite: boolean,
-  ): Promise<{ acknowledged: Boolean }> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .patch(`/folders/favorite`, { ids, favorite })
-        .then((response) => {
-          resolve(response.data)
-        })
-        .catch((error) => {
-          reject(error)
-        })
-    })
+  const getDiskSpace = async () => {
+    const { data } = await axios.get<Disk>('/disk')
+    return data
   }
 
-  public async moveToTrash(ids: string[]): Promise<{ acknowledged: Boolean }> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .patch(`/folders/trash`, { ids })
-        .then((response) => {
-          resolve(response.data)
-        })
-        .catch((error) => {
-          reject(error)
-        })
-    })
-  }
-
-  public async rename(
-    id: string,
-    folderName: string,
-  ): Promise<{ acknowledged: Boolean }> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .patch(`/folders/rename/${id}`, { folderName })
-        .then((response) => {
-          resolve(response.data)
-        })
-        .catch((error) => {
-          reject(error)
-        })
-    })
-  }
-
-  public async move(
-    ids: string[],
-    parentId: string,
-  ): Promise<{ acknowledged: Boolean }> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .patch(`/folders/move`, { ids, parentId })
-        .then((response) => {
-          resolve(response.data)
-        })
-        .catch((error) => {
-          reject(error)
-        })
-    })
-  }
-
-  public async delete(ids: string[]): Promise<{
-    acknowledged: Boolean
-    matchedCount: number
-    modifiedCount: number
-  }> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .delete(`/folders/`, { params: { ids } })
-        .then((response) => {
-          resolve(response.data)
-        })
-        .catch((error) => {
-          reject(error)
-        })
-    })
-  }
-
-  public async getDiskSpace(): Promise<Disk> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .get(`/disk`)
-        .then((response) => {
-          resolve(response.data)
-        })
-        .catch((error) => {
-          reject(error)
-        })
-    })
+  return {
+    getFolders,
+    getFolderById,
+    createFolder,
+    uploadFolders,
+    downloadFolders,
+    favoriteFolders,
+    moveFoldersToTrash,
+    renameFolder,
+    moveFolders,
+    deleteFolders,
+    getDiskSpace,
   }
 }
 
-export { FolderService }
+export { useFolderService }

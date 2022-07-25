@@ -8,19 +8,17 @@ import { FoldersSection } from '../../components/folders'
 import { NewFolder } from '../../components/folders/new'
 import { useStaticPageController } from './controller'
 import { Container } from './styles'
-import { RootState } from '../../../../../infrastructure/redux/store'
-import { useSelector } from 'react-redux'
 import { ReplaceFiles } from '../../components/files/replace'
 
-const StaticPage: React.FC = () => {
+interface Props {
+  parentId?: string
+}
+
+const StaticPage: React.FC<Props> = (props) => {
   const containerId = 'static-page'
   const uploaderId = 'home-page-uploader'
 
-  const {
-    user: { id: userId, staticFolder },
-  } = useSelector((state: RootState) => state.profile)
-
-  const { id: parentId = staticFolder.id } = useParams()
+  const { id: parentId = props.parentId || '' } = useParams()
 
   const {
     newFolderModalVisible,
@@ -30,7 +28,7 @@ const StaticPage: React.FC = () => {
     handleReplace,
     clearReplaceFiles,
     replaceFiles,
-  } = useStaticPageController({ parentId, userId, containerId, uploaderId })
+  } = useStaticPageController({ parentId, containerId, uploaderId })
 
   const renderNewFolder = () => {
     return (

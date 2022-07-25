@@ -1,22 +1,17 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import React from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { Selection } from '../../components/selection'
+import { useFavoritesPageController } from './controller'
 import { FilesSection } from '../../components/files'
 import { FoldersSection } from '../../components/folders'
-import { useFavoritesPageController } from './controller'
 import { Container } from './styles'
-import { useSelector } from 'react-redux'
-import { RootState } from '../../../../../infrastructure/redux/store'
 
 const FavoritesPage: React.FC = () => {
   const containerId = 'favorites-page'
 
-  const {
-    user: { id: userId },
-  } = useSelector((state: RootState) => state.profile)
-
-  useFavoritesPageController({ userId, containerId })
+  useFavoritesPageController({ containerId })
 
   return (
     <Selection containerId={containerId}>

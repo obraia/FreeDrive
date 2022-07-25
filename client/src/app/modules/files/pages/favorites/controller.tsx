@@ -4,7 +4,6 @@ import { clearAllSelections } from '../../reducers/files.reducer'
 import { setPage } from '../../../../../infrastructure/redux/reducers/pages'
 
 interface Props {
-  userId: string
   containerId: string
 }
 

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { TbFile, TbFolder, TbFolderPlus, TbInfoCircle } from 'react-icons/tb'
-import { FileService } from '../../../../../infrastructure/services/file/file.service'
-import { FolderService } from '../../../../../infrastructure/services/folder/folder.service'
+import { useFileService } from '../../../../../infrastructure/services/file/file.service'
+import { useFolderService } from '../../../../../infrastructure/services/folder/folder.service'
+import { getSequencePaths } from '../../../shared/utils/formatters/paths.formatter'
+import { setPage } from '../../../../../infrastructure/redux/reducers/pages'
 
 import {
   addFiles,
@@ -15,11 +17,7 @@ import {
   showMenu,
 } from '../../../../../infrastructure/redux/reducers/contextmenu'
 
-import { setPage } from '../../../../../infrastructure/redux/reducers/pages'
-import { getSequencePaths } from '../../../shared/utils/formatters/paths.formatter'
-
 interface Props {
-  userId: string
   parentId: string
   containerId: string
   uploaderId: string
@@ -31,8 +29,8 @@ function useStaticPageController(props: Props) {
 
   const dispatch = useDispatch()
 
-  const fileService = new FileService()
-  const folderService = new FolderService()
+  const { uploadStaticFiles } = useFileService()
+  const { createFolder, getFolderById } = useFolderService()
 
   const contextItems = () => {
     return [
@@ -124,26 +122,24 @@ function useStaticPageController(props: Props) {
 
     const formData = new FormData()
 
-    formData.append('userId', props.userId)
     formData.append('parentId', props.parentId)
 
     for (let i = 0; i < files.length; i++) {
       formData.append('files', files[i])
-      setReplaceFiles((value) => [...value, files[i]])
+      // setReplaceFiles((value) => [...value, files[i]])
     }
 
-    // fileService.uploadStatic(formData).then((data) => {
-    //   dispatch(addFiles(data))
-    // })
+    uploadStaticFiles(formData).then((data) => {
+      dispatch(addFiles(data))
+    })
   }
 
   const handleNewFolder = (folderName: string) => {
     const formData = new FormData()
     formData.append('folderName', folderName)
     formData.append('parentId', props.parentId)
-    formData.append('userId', props.userId)
 
-    folderService.createFolder(formData).then((data) => {
+    createFolder(formData).then((data) => {
       dispatch(addFolders([data]))
     })
 
@@ -186,7 +182,7 @@ function useStaticPageController(props: Props) {
   }
 
   useEffect(() => {
-    folderService.getFolderById(props.parentId).then((folder) => {
+    getFolderById(props.parentId).then((folder) => {
       dispatch(
         setPage({
           title: folder?.folderName + ' - Free Drive',

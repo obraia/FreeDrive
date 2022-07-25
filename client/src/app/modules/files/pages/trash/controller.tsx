@@ -2,15 +2,14 @@ import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { TbFolder, TbInfoCircle } from 'react-icons/tb'
 import { clearAllSelections } from '../../reducers/files.reducer'
+import { setPage } from '../../../../../infrastructure/redux/reducers/pages'
 
 import {
   hideMenu,
   showMenu,
 } from '../../../../../infrastructure/redux/reducers/contextmenu'
-import { setPage } from '../../../../../infrastructure/redux/reducers/pages'
 
 interface Props {
-  userId: string
   containerId: string
 }
 

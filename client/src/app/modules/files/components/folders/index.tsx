@@ -34,7 +34,7 @@ const FoldersSection: React.FC<Props> = (props) => {
   const renderFolders = () => {
     return folders.map((folder, index) => (
       <Folder
-        key={folder._id}
+        key={folder.id}
         folder={folder}
         className={isFolderSelected(folder) ? 'selected' : ''}
         onMouseDownCapture={(e) => handleSelectFolder(e, index)}

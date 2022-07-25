@@ -89,7 +89,7 @@ class LocalStorageEngine implements multer.StorageEngine {
       })
     })
 
-    file.stream.on('error', cb)
+    file.stream.on('error', (error) => cb(error))
   }
 
   _removeFile(

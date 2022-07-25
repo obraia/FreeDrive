@@ -17,19 +17,17 @@ import {
   showMenu,
 } from '../../../../../infrastructure/redux/reducers/contextmenu'
 
-import { RootState } from '../../../../../infrastructure/redux/store'
-
 import {
-  addFiles,
   clearFiles,
   selectFiles,
   setContextMenuItems,
   setFiles,
 } from '../../reducers/files.reducer'
 
+import { RootState } from '../../../../../infrastructure/redux/store'
 import { ContextMenuItem } from '../../../shared/components/layout/contextmenu'
-import { FileService } from '../../../../../infrastructure/services/file/file.service'
-import { IFileChild } from '../../../../../infrastructure/services/folder/interfaces'
+import { useFileService } from '../../../../../infrastructure/services/file/file.service'
+import { IFile } from '../../../../../infrastructure/services/file/file.service.d'
 import { FilesSectionProps } from '.'
 
 const contextMenuItemsIds = {
@@ -49,7 +47,7 @@ type ContextItemsKey = typeof contextMenuItemsIds[keyof typeof contextMenuItemsI
 
 interface Raname {
   visible: boolean
-  file: IFileChild | null
+  file: IFile | null
 }
 
 const useFileSectionController = (props: FilesSectionProps) => {
@@ -58,9 +56,18 @@ const useFileSectionController = (props: FilesSectionProps) => {
   const { selectedFiles, files } = useSelector((state: RootState) => state.files)
 
   const dispatch = useDispatch()
-  const service = new FileService()
 
-  const contextMenuItems = (file: Partial<IFileChild>) => [
+  const {
+    downloadFiles,
+    favoriteFiles,
+    downloadFile,
+    moveToTrash,
+    deleteFiles,
+    renameFile,
+    getFiles,
+  } = useFileService()
+
+  const contextMenuItems = (file: { favorite: boolean }) => [
     {
       id: contextMenuItemsIds.LINK,
       name: 'Copiar link',
@@ -134,7 +141,7 @@ const useFileSectionController = (props: FilesSectionProps) => {
   ]
 
   const getContextMenuItems = (): ContextMenuItem[] => {
-    const selection = files.filter((f) => selectedFiles.includes(f._id))
+    const selection = files.filter((f) => selectedFiles.includes(f.id))
 
     const hasFavorite =
       selection.every((f) => f.favorite) || (files[0].favorite && files.length === 1)
@@ -154,9 +161,9 @@ const useFileSectionController = (props: FilesSectionProps) => {
   const handleFavorite = (favorite: boolean) => {
     if (!selectedFiles.length) return
 
-    service.favorite(selectedFiles, favorite).then(() => {
+    favoriteFiles(selectedFiles, favorite).then(() => {
       const newFiles = files
-        .map((f) => (selectedFiles.includes(f._id) ? { ...f, favorite } : f))
+        .map((f) => (selectedFiles.includes(f.id) ? { ...f, favorite } : f))
         .filter((f) => (props.favorite ? f.favorite : true))
 
       dispatch(setFiles(newFiles))
@@ -179,11 +186,11 @@ const useFileSectionController = (props: FilesSectionProps) => {
     }
 
     if (selectedFiles.length > 1) {
-      service.downloadMany(selectedFiles).then((res) => {
+      downloadFiles(selectedFiles).then((res) => {
         fileToDownload(res)
       })
     } else {
-      service.downloadById(selectedFiles[0]).then((res) => {
+      downloadFile(selectedFiles[0]).then((res) => {
         fileToDownload(res)
       })
     }
@@ -194,8 +201,8 @@ const useFileSectionController = (props: FilesSectionProps) => {
   const handleTrash = () => {
     if (!selectedFiles.length) return
 
-    service.moveToTrash(selectedFiles).then(() => {
-      const newFiles = files.filter((f) => !selectedFiles.includes(f._id))
+    moveToTrash(selectedFiles).then(() => {
+      const newFiles = files.filter((f) => !selectedFiles.includes(f.id))
       dispatch(setFiles(newFiles))
     })
 
@@ -205,8 +212,8 @@ const useFileSectionController = (props: FilesSectionProps) => {
   const handleDelete = () => {
     if (!selectedFiles.length) return
 
-    service.delete(selectedFiles).then(() => {
-      const newFiles = files.filter((f) => !selectedFiles.includes(f._id))
+    deleteFiles(selectedFiles).then(() => {
+      const newFiles = files.filter((f) => !selectedFiles.includes(f.id))
       dispatch(setFiles(newFiles))
     })
 
@@ -218,9 +225,9 @@ const useFileSectionController = (props: FilesSectionProps) => {
 
     if (!file) return
 
-    service.rename(file._id, originalName).then(() => {
+    renameFile(file.id, originalName).then(() => {
       const newFiles = files.map((f) =>
-        f._id === file._id ? { ...f, originalName } : f,
+        f.id === file.id ? { ...f, originalName } : f,
       )
 
       dispatch(setFiles(newFiles))
@@ -249,7 +256,7 @@ const useFileSectionController = (props: FilesSectionProps) => {
     if (
       e.buttons === 2 &&
       selectedFiles.length >= 1 &&
-      selectedFiles.includes(file._id)
+      selectedFiles.includes(file.id)
     ) {
       return
     }
@@ -259,20 +266,20 @@ const useFileSectionController = (props: FilesSectionProps) => {
     let filesIds = [] as string[]
 
     if (e.metaKey && selectedFiles.length > 0) {
-      if (selectedFiles.includes(file._id)) {
-        filesIds = selectedFiles.filter((i) => i !== file._id)
+      if (selectedFiles.includes(file.id)) {
+        filesIds = selectedFiles.filter((i) => i !== file.id)
       } else {
-        filesIds = [file._id, ...selectedFiles]
+        filesIds = [file.id, ...selectedFiles]
       }
     } else if (e.shiftKey && selectedFiles.length > 0) {
       const firstSelected = selectedFiles[0]
-      const firstIndex = files.findIndex((f) => f._id === firstSelected)
+      const firstIndex = files.findIndex((f) => f.id === firstSelected)
       const first = Math.min(firstIndex, index)
       const last = Math.max(firstIndex, index)
 
-      filesIds = files.filter((_, i) => i >= first && i <= last).map((f) => f._id)
+      filesIds = files.filter((_, i) => i >= first && i <= last).map((f) => f.id)
     } else {
-      filesIds = [file._id]
+      filesIds = [file.id]
     }
 
     dispatch(selectFiles({ ids: filesIds }))
@@ -283,7 +290,7 @@ const useFileSectionController = (props: FilesSectionProps) => {
 
     const [id] = selectedFiles
 
-    const file = files.find((f) => f._id === id)
+    const file = files.find((f) => f.id === id)
 
     navigator.clipboard.writeText(
       `http://localhost:3003/api/static/files/${id}?mimetype=${file?.mimetype}`,
@@ -297,7 +304,7 @@ const useFileSectionController = (props: FilesSectionProps) => {
       setRename({ visible: false, file: null })
     } else {
       dispatch(hideMenu())
-      const file = files.find((f) => selectedFiles.includes(f._id))
+      const file = files.find((f) => selectedFiles.includes(f.id))
 
       if (file) {
         setRename({ visible: true, file })
@@ -305,17 +312,16 @@ const useFileSectionController = (props: FilesSectionProps) => {
     }
   }
 
-  const isFileSelected = (f: IFileChild) => selectedFiles.includes(f._id)
+  const isFileSelected = (f: IFile) => selectedFiles.includes(f.id)
 
   useEffect(() => {
-    service
-      .getFiles({
-        parentId: props.parentId,
-        deleted: props.deleted,
-        favorite: props.favorite,
-        limit: props.limit,
-        page: props.page,
-      })
+    getFiles({
+      parentId: props.parentId,
+      deleted: props.deleted,
+      favorite: props.favorite,
+      limit: props.limit,
+      page: props.page,
+    })
       .then((data) => {
         if (data.length) {
           const newFiles = props.page > 1 ? [...files, ...data] : data

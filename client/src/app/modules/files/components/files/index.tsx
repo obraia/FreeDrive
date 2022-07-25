@@ -1,12 +1,11 @@
 import React from 'react'
 import { TbArrowUp } from 'react-icons/tb'
 import { useDrag } from 'react-dnd'
-import { Rename } from '../rename'
-
-import { Body, Container, Header, SortButton, Title } from './styles'
-import { File } from './file'
-import { ItemTypes } from '../dragLayer'
 import { ContextItemsKey, useFileSectionController } from './controller'
+import { Rename } from '../rename'
+import { ItemTypes } from '../dragLayer'
+import { File } from './file'
+import { Body, Container, Header, SortButton, Title } from './styles'
 
 export interface FilesSectionProps {
   parentId?: string
@@ -41,7 +40,7 @@ const FilesSection: React.FC<FilesSectionProps> = (props) => {
   const renderFiles = () => {
     return files.map((file, index) => (
       <File
-        key={file._id}
+        key={file.id}
         file={file}
         className={isFileSelected(file) ? 'selected' : ''}
         onMouseDownCapture={(e) => handleSelectFile(e, index)}

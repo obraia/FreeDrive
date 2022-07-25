@@ -6,7 +6,7 @@ import storage from 'redux-persist/lib/storage'
 
 import themeReducer from '../reducers/theme'
 import pagesReducer from '../reducers/pages'
-import prodileReducer from '../reducers/profile'
+import authReducer from '../reducers/auth'
 import contextMenuReducer from '../reducers/contextmenu'
 import filesReducer from '../../../app/modules/files/reducers/files.reducer'
 
@@ -15,7 +15,7 @@ const reducers = combineReducers({
   contextMenu: contextMenuReducer,
   files: filesReducer,
   pages: pagesReducer,
-  profile: prodileReducer,
+  auth: authReducer,
 })
 
 const persistConfig = {

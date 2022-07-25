@@ -27,8 +27,8 @@ import {
 } from '../../reducers/files.reducer'
 
 import { ContextMenuItem } from '../../../shared/components/layout/contextmenu'
-import { FolderService } from '../../../../../infrastructure/services/folder/folder.service'
-import { IFolderChild } from '../../../../../infrastructure/services/folder/interfaces'
+import { useFolderService } from '../../../../../infrastructure/services/folder/folder.service'
+import { IFolder } from '../../../../../infrastructure/services/folder/folder.service.d'
 import { useNavigate } from 'react-router-dom'
 
 const contextMenuItemsIds = {
@@ -55,7 +55,7 @@ interface Props {
 
 interface Raname {
   visible: boolean
-  folder: IFolderChild | null
+  folder: IFolder | null
 }
 
 function useFolderSectionController(props: Props) {
@@ -67,9 +67,17 @@ function useFolderSectionController(props: Props) {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const service = new FolderService()
+  const {
+    favoriteFolders,
+    downloadFolders,
+    moveFoldersToTrash,
+    deleteFolders,
+    renameFolder,
+    moveFolders,
+    getFolders,
+  } = useFolderService()
 
-  const contextMenuItems = (folder: Partial<IFolderChild>) => [
+  const contextMenuItems = (folder: Partial<IFolder>) => [
     {
       id: contextMenuItemsIds.MOVE,
       name: 'Mover para',
@@ -136,7 +144,7 @@ function useFolderSectionController(props: Props) {
   ]
 
   const getContextMenuItems = (): ContextMenuItem[] => {
-    const selection = folders.filter((f) => selectedFolders.includes(f._id))
+    const selection = folders.filter((f) => selectedFolders.includes(f.id))
 
     const hasFavorite =
       selection.every((f) => f.favorite) ||
@@ -157,9 +165,9 @@ function useFolderSectionController(props: Props) {
   const handleFavorite = (favorite: boolean) => {
     if (!selectedFolders.length) return
 
-    service.favorite(selectedFolders, favorite).then((res) => {
+    favoriteFolders(selectedFolders, favorite).then((res) => {
       const newFolders = folders.map((f) =>
-        selectedFolders.includes(f._id) ? { ...f, favorite } : f,
+        selectedFolders.includes(f.id) ? { ...f, favorite } : f,
       )
 
       dispatch(setFolders(newFolders))
@@ -181,7 +189,7 @@ function useFolderSectionController(props: Props) {
       link.remove()
     }
 
-    service.download(selectedFolders).then((res) => {
+    downloadFolders(selectedFolders).then((res) => {
       folderToDownload(res)
     })
 
@@ -191,9 +199,9 @@ function useFolderSectionController(props: Props) {
   const handleTrash = () => {
     if (!selectedFolders.length) return
 
-    service.moveToTrash(selectedFolders).then(() => {
-      const newFiles = folders.filter((f) => !selectedFolders.includes(f._id))
-      dispatch(setFolders(newFiles))
+    moveFoldersToTrash(selectedFolders).then(() => {
+      const newFolders = folders.filter((f) => !selectedFolders.includes(f.id))
+      dispatch(setFolders(newFolders))
     })
 
     dispatch(hideMenu())
@@ -202,8 +210,8 @@ function useFolderSectionController(props: Props) {
   const handleDelete = () => {
     if (!selectedFolders.length) return
 
-    service.delete(selectedFolders).then(() => {
-      const newFolders = folders.filter((f) => !selectedFolders.includes(f._id))
+    deleteFolders(selectedFolders).then(() => {
+      const newFolders = folders.filter((f) => !selectedFolders.includes(f.id))
       dispatch(setFolders(newFolders))
     })
 
@@ -215,9 +223,9 @@ function useFolderSectionController(props: Props) {
 
     if (!folder) return
 
-    service.rename(folder._id, originalName).then(() => {
+    renameFolder(folder.id, originalName).then(() => {
       const newFolders = folders.map((f) =>
-        f._id === folder._id ? { ...f, originalName } : f,
+        f.id === folder.id ? { ...f, originalName } : f,
       )
 
       dispatch(setFolders(newFolders))
@@ -246,7 +254,7 @@ function useFolderSectionController(props: Props) {
     if (
       e.buttons === 2 &&
       selectedFolders.length >= 1 &&
-      selectedFolders.includes(folder._id)
+      selectedFolders.includes(folder.id)
     ) {
       return
     }
@@ -256,30 +264,28 @@ function useFolderSectionController(props: Props) {
     let foldersIds = [] as string[]
 
     if (e.metaKey && selectedFolders.length > 0) {
-      if (selectedFolders.includes(folder._id)) {
-        foldersIds = selectedFolders.filter((i) => i !== folder._id)
+      if (selectedFolders.includes(folder.id)) {
+        foldersIds = selectedFolders.filter((i) => i !== folder.id)
       } else {
-        foldersIds = [folder._id, ...selectedFolders]
+        foldersIds = [folder.id, ...selectedFolders]
       }
     } else if (e.shiftKey && selectedFolders.length > 0) {
       const firstSelected = selectedFolders[0]
-      const firstIndex = folders.findIndex((f) => f._id === firstSelected)
+      const firstIndex = folders.findIndex((f) => f.id === firstSelected)
       const first = Math.min(firstIndex, index)
       const last = Math.max(firstIndex, index)
 
-      foldersIds = folders
-        .filter((_, i) => i >= first && i <= last)
-        .map((f) => f._id)
+      foldersIds = folders.filter((_, i) => i >= first && i <= last).map((f) => f.id)
     } else {
-      foldersIds = [folder._id]
+      foldersIds = [folder.id]
     }
 
     dispatch(selectFolders({ ids: foldersIds }))
   }
 
   const handleMove = async (parentId: string) => {
-    service.move(selectedFolders, parentId).then((res) => {
-      const newFolders = folders.filter((f) => !selectedFolders.includes(f._id))
+    moveFolders(selectedFolders, parentId).then((res) => {
+      const newFolders = folders.filter((f) => !selectedFolders.includes(f.id))
       dispatch(setFolders(newFolders))
     })
   }
@@ -289,7 +295,7 @@ function useFolderSectionController(props: Props) {
       setRename({ visible: false, folder: null })
     } else {
       dispatch(hideMenu())
-      const folder = folders.find((f) => selectedFolders.includes(f._id))
+      const folder = folders.find((f) => selectedFolders.includes(f.id))
 
       if (folder) {
         setRename({ visible: true, folder })
@@ -297,19 +303,18 @@ function useFolderSectionController(props: Props) {
     }
   }
 
-  const goToFolder = (folder: IFolderChild) => {
-    navigate(`${currentPage}/${folder._id}`)
+  const goToFolder = (folder: IFolder) => {
+    navigate(`${currentPage}/${folder.id}`)
   }
 
-  const isFolderSelected = (f: IFolderChild) => selectedFolders.includes(f._id)
+  const isFolderSelected = (f: IFolder) => selectedFolders.includes(f.id)
 
   useEffect(() => {
-    service
-      .getFolders({
-        parentId: props.parentId,
-        deleted: props.deleted,
-        favorite: props.favorite,
-      })
+    getFolders({
+      parentId: props.parentId,
+      deleted: props.deleted,
+      favorite: props.favorite,
+    })
       .then((data) => {
         if (data.length) {
           dispatch(setFolders(data))

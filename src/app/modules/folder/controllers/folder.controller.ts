@@ -9,6 +9,7 @@ import { FolderRepository } from '../repositories/folder.repository'
 import { BadRequestException } from '../../shared/exceptions/badRequest.exception'
 import { NotfoundException } from '../../shared/exceptions/notfound.exception'
 import { IFolder } from '../models/folder.interface'
+import { FsHelper } from '../../../utils/helpers/fs.helper'
 
 @boundClass
 class FolderController extends BaseController<IFolder> {
@@ -110,6 +111,15 @@ class FolderController extends BaseController<IFolder> {
         throw new NotfoundException('Not found')
       }
 
+      return this.sendSuccess(res, result)
+    } catch (error: any) {
+      this.sendError(res, error)
+    }
+  }
+
+  public async getDiskSpace(req: Request, res: Response) {
+    try {
+      const result = await FsHelper.getDiskSpace()
       return this.sendSuccess(res, result)
     } catch (error: any) {
       this.sendError(res, error)

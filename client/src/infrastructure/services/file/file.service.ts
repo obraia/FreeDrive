@@ -1,201 +1,104 @@
-import axios, { AxiosInstance } from 'axios'
-import { IFileChild } from '../folder/interfaces'
+import { useAxios } from '../../../app/modules/shared/hooks/useAxios'
+
+import {
+  IGetFilesParams,
+  IGetFilesResponse,
+  IUploadFileResponse,
+  IDownloadFileResponse,
+  IFavoriteResponse,
+  IMoveToTrashResponse,
+  IRenameResponse,
+  IMoveResponse,
+  IDeleteResponse,
+} from './file.service.d'
 
 export interface Disk {
   total: number
   used: number
 }
 
-interface Params {
-  parentId?: string
-  favorite?: boolean
-  deleted?: boolean
-  limit: number
-  page: number
-}
+const useFileService = () => {
+  const axios = useAxios()
 
-class FileService {
-  private api: AxiosInstance
-  private url: string
-
-  constructor() {
-    this.url = 'http://localhost:3003/api'
-
-    this.api = axios.create({
-      baseURL: this.url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+  const getFiles = async (params: IGetFilesParams) => {
+    const { data } = await axios.get<IGetFilesResponse>('/files', { params })
+    return data
   }
 
-  public async getFiles(params: Params): Promise<any[]> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .get(`/files`, { params })
-        .then((response) => {
-          resolve(response.data)
-        })
-        .catch((error) => {
-          reject(error)
-        })
-    })
+  const uploadFiles = async (formData: FormData) => {
+    const { data } = await axios.post<IUploadFileResponse>('/files', formData)
+    return data
   }
 
-  public async getFile(path: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .get(`/files/${path}`)
-        .then((response) => {
-          resolve(response.data)
-        })
-        .catch((error) => {
-          reject(error)
-        })
-    })
+  const uploadStaticFiles = async (formData: FormData) => {
+    const { data } = await axios.post<IUploadFileResponse>('/files/static', formData)
+    return data
   }
 
-  public async upload(formData: FormData): Promise<IFileChild[]> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .post(`/files/`, formData)
-        .then((response) => {
-          resolve(response.data)
-        })
-        .catch((error) => {
-          reject(error)
-        })
-    })
+  const downloadFile = async (id: string) => {
+    const { data, headers } = await axios.get<IDownloadFileResponse>(
+      `/files/download/${id}`,
+      { responseType: 'blob' },
+    )
+    return { data, originalName: headers['file-name'] }
   }
 
-  public async uploadStatic(formData: FormData): Promise<IFileChild[]> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .post(`/files/static`, formData)
-        .then((response) => {
-          resolve(response.data)
-        })
-        .catch((error) => {
-          reject(error)
-        })
-    })
+  const downloadFiles = async (ids: string[]) => {
+    const { data, headers } = await axios.get<IDownloadFileResponse>(
+      `/files/download`,
+      { params: { ids }, responseType: 'blob' },
+    )
+    return { data, originalName: headers['file-name'] }
   }
 
-  public async downloadById(
-    id: string,
-  ): Promise<{ data: any; originalName: string }> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .get(`/files/download/${id}`, { responseType: 'blob' })
-        .then((response) => {
-          resolve({
-            data: response.data,
-            originalName: response.headers['file-name'],
-          })
-        })
-        .catch((error) => {
-          reject(error)
-        })
+  const favoriteFiles = async (ids: string[], favorite: boolean) => {
+    const { data } = await axios.patch<IFavoriteResponse>('/files/favorite', {
+      ids,
+      favorite,
     })
+    return data
   }
 
-  public async downloadMany(
-    ids: string[],
-  ): Promise<{ data: any; originalName: string }> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .get(`/files/download`, { params: { ids }, responseType: 'blob' })
-        .then((response) => {
-          resolve({
-            data: response.data,
-            originalName: response.headers['file-name'],
-          })
-        })
-        .catch((error) => {
-          reject(error)
-        })
-    })
+  const moveToTrash = async (ids: string[]) => {
+    const { data } = await axios.patch<IMoveToTrashResponse>('/files/trash', { ids })
+    return data
   }
 
-  public async favorite(
-    ids: string[],
-    favorite: boolean,
-  ): Promise<{ acknowledged: Boolean }> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .patch(`/files/favorite`, { ids, favorite })
-        .then((response) => {
-          resolve(response.data)
-        })
-        .catch((error) => {
-          reject(error)
-        })
+  const renameFile = async (id: string, originalName: string) => {
+    const { data } = await axios.patch<IRenameResponse>('/files/rename', {
+      id,
+      originalName,
     })
+    return data
   }
 
-  public async moveToTrash(
-    ids: string[],
-  ): Promise<{ acknowledged: Boolean; deletedCount: number }> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .patch(`/files/trash`, { ids })
-        .then((response) => {
-          resolve(response.data)
-        })
-        .catch((error) => {
-          reject(error)
-        })
+  const moveFiles = async (ids: string[], parentId: string) => {
+    const { data } = await axios.patch<IMoveResponse>('/files/move', {
+      ids,
+      parentId,
     })
+    return data
   }
 
-  public async rename(
-    id: string,
-    originalName: string,
-  ): Promise<{ acknowledged: Boolean }> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .patch(`/files/rename/${id}`, { originalName })
-        .then((response) => {
-          resolve(response.data)
-        })
-        .catch((error) => {
-          reject(error)
-        })
+  const deleteFiles = async (ids: string[]) => {
+    const { data } = await axios.delete<IDeleteResponse>('/files', {
+      params: { ids },
     })
+    return data
   }
 
-  public async move(
-    ids: string[],
-    parentId: string,
-  ): Promise<{ acknowledged: Boolean }> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .patch(`/files/move`, { ids, parentId })
-        .then((response) => {
-          resolve(response.data)
-        })
-        .catch((error) => {
-          reject(error)
-        })
-    })
-  }
-
-  public async delete(ids: string[]): Promise<{
-    acknowledged: Boolean
-    matchedCount: number
-    modifiedCount: number
-  }> {
-    return new Promise((resolve, reject) => {
-      this.api
-        .delete(`/files`, { params: { ids } })
-        .then((response) => {
-          resolve(response.data)
-        })
-        .catch((error) => {
-          reject(error)
-        })
-    })
+  return {
+    getFiles,
+    uploadFiles,
+    uploadStaticFiles,
+    downloadFile,
+    downloadFiles,
+    favoriteFiles,
+    moveToTrash,
+    renameFile,
+    moveFiles,
+    deleteFiles,
   }
 }
 
-export { FileService }
+export { useFileService }

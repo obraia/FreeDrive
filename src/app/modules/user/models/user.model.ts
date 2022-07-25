@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose'
+import { hash } from 'bcrypt'
 import { FolderModel } from '../../folder/models/folder.model'
 import { FileModel } from '../../file/models/file.model'
 import { IUser } from './user.interface'
@@ -55,6 +56,7 @@ const userSchema = new Schema(
 
 userSchema.pre('save', async function (next) {
   const user = this as IUser
+  const { AUTH_SALT_ROUNDS } = process.env
 
   const driveFolder = await FolderModel.create({
     userId: user.id,
@@ -70,6 +72,7 @@ userSchema.pre('save', async function (next) {
 
   user.driveFolderId = driveFolder.id
   user.staticFolderId = staticFolder.id
+  user.password = await hash(user.password, Number(AUTH_SALT_ROUNDS))
 
   next()
 })

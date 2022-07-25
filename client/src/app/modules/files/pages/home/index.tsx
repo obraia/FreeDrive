@@ -2,32 +2,30 @@ import React from 'react'
 import { useParams } from 'react-router-dom'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+import { NewFolder } from '../../components/folders/new'
 import { Selection } from '../../components/selection'
 import { FilesSection } from '../../components/files'
 import { FoldersSection } from '../../components/folders'
-import { NewFolder } from '../../components/folders/new'
 import { useHomePageController } from './controller'
-import { Container } from './styles'
 import { useInfinityScroll } from '../../../shared/hooks/useInfinityScroll'
-import { RootState } from '../../../../../infrastructure/redux/store'
-import { useSelector } from 'react-redux'
+import { Container } from './styles'
 
-const HomePage: React.FC = () => {
+interface Props {
+  parentId?: string
+}
+
+const HomePage: React.FC<Props> = (props) => {
   const containerId = 'home-page'
   const uploaderId = 'home-page-uploader'
 
-  const {
-    user: { id: userId, driveFolder },
-  } = useSelector((state: RootState) => state.profile)
-
-  const { id: parentId = driveFolder.id } = useParams()
+  const { id: parentId = props.parentId || '' } = useParams()
 
   const {
     newFolderModalVisible,
     toggleNewFolderModal,
     handleNewFolder,
     handleContextMenu,
-  } = useHomePageController({ parentId, userId, containerId, uploaderId })
+  } = useHomePageController({ parentId, containerId, uploaderId })
 
   const { limit, page, handleScroll } = useInfinityScroll({
     initialLimit: 40,

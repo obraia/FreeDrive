@@ -1,18 +1,44 @@
-import { Router } from 'express'
+import { RequestHandler, Router } from 'express'
+import { BaseRoutes } from '../../shared/routes/base.routes'
 import { UserController } from '../controllers/user.controller'
 
-class UserRoutes {
+class UserRoutes extends BaseRoutes {
   private _controller: UserController
 
-  constructor(private _router: Router) {
+  constructor(_router: Router, private _authMiddleware: RequestHandler) {
+    super(_router)
+
     this._controller = new UserController()
     this._init()
   }
 
   private _init(): void {
-    this._router.get('/users/:id', this._controller.findById.bind(this._controller))
-    this._router.post('/users', this._controller.create.bind(this._controller))
-    this._router.patch('/users', this._controller.update.bind(this._controller))
+    super.load([
+      {
+        method: 'get',
+        path: '/users/current',
+        handler: this._controller.findCurrent,
+        middlewares: [this._authMiddleware],
+      },
+      {
+        method: 'get',
+        path: '/users/:id',
+        handler: this._controller.findById,
+        middlewares: [this._authMiddleware],
+      },
+      {
+        method: 'post',
+        path: '/users',
+        handler: this._controller.create,
+        middlewares: [this._authMiddleware],
+      },
+      {
+        method: 'patch',
+        path: '/users',
+        handler: this._controller.update,
+        middlewares: [this._authMiddleware],
+      },
+    ])
   }
 }
 

@@ -1,15 +1,17 @@
 import { RequestHandler, Router } from 'express'
 import sharp from 'sharp'
+import { BaseRoutes } from '../../shared/routes/base.routes'
 import { FilesController } from '../controllers/files.controller'
 import driveEngine from '../engines/drive.engine'
-import staticEngine from '../engines/static.engine'
 
-class FilesRoutes {
+class FilesRoutes extends BaseRoutes {
   private _controller: FilesController
   private _uploadDrive: RequestHandler
   private _uploadStatic: RequestHandler
 
-  constructor(private _router: Router) {
+  constructor(router: Router, private _authMiddleware: RequestHandler) {
+    super(router)
+
     this._controller = new FilesController()
 
     const { DRIVE_DIR, THUMBS_DIR, FILES_DIR } = process.env
@@ -35,18 +37,80 @@ class FilesRoutes {
   }
 
   private _init(): void {
-    this._router.get('/files', this._controller.find)
-    this._router.get('/files/download', this._controller.downloadMany)
-    this._router.get('/files/download/:id', this._controller.downloadById)
-    this._router.post('/files', this._uploadDrive, this._controller.create)
-    this._router.post('/files/static', this._uploadStatic, this._controller.create)
-    this._router.patch('/files/favorite', this._controller.favorite)
-    this._router.patch('/files/move', this._controller.move)
-    this._router.patch('/files/trash', this._controller.moveToTrash)
-    this._router.patch('/files/rename/:id', this._controller.rename)
-    this._router.delete('/files', this._controller.deleteMany)
-    this._router.get('/files/:id', this._controller.findById)
-    this._router.delete('/files:id', this._controller.deleteById)
+    super.load([
+      {
+        method: 'get',
+        path: '/files',
+        handler: this._controller.find,
+        middlewares: [this._authMiddleware],
+      },
+      {
+        method: 'get',
+        path: '/files/download',
+        handler: this._controller.downloadMany,
+        middlewares: [this._authMiddleware],
+      },
+      {
+        method: 'get',
+        path: '/files/download/:id',
+        handler: this._controller.downloadById,
+        middlewares: [this._authMiddleware],
+      },
+      {
+        method: 'post',
+        path: '/files',
+        handler: this._controller.create,
+        middlewares: [this._authMiddleware, this._uploadDrive],
+      },
+      {
+        method: 'post',
+        path: '/files/static',
+        handler: this._controller.create,
+        middlewares: [this._authMiddleware, this._uploadStatic],
+      },
+      {
+        method: 'patch',
+        path: '/files/favorite',
+        handler: this._controller.favorite,
+        middlewares: [this._authMiddleware],
+      },
+      {
+        method: 'patch',
+        path: '/files/move',
+        handler: this._controller.move,
+        middlewares: [this._authMiddleware],
+      },
+      {
+        method: 'patch',
+        path: '/files/trash',
+        handler: this._controller.moveToTrash,
+        middlewares: [this._authMiddleware],
+      },
+      {
+        method: 'patch',
+        path: '/files/rename/:id',
+        handler: this._controller.rename,
+        middlewares: [this._authMiddleware],
+      },
+      {
+        method: 'delete',
+        path: '/files',
+        handler: this._controller.deleteMany,
+        middlewares: [this._authMiddleware],
+      },
+      {
+        method: 'get',
+        path: '/files/:id',
+        handler: this._controller.findById,
+        middlewares: [this._authMiddleware],
+      },
+      {
+        method: 'delete',
+        path: '/files:id',
+        handler: this._controller.deleteById,
+        middlewares: [this._authMiddleware],
+      },
+    ])
   }
 }
 

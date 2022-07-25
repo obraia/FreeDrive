@@ -1,11 +1,11 @@
-import React from 'react';
-import { useDragLayer } from 'react-dnd';
-import { IFileChild } from '../../../../../infrastructure/services/folder/interfaces';
-import { FileDragPreview } from '../files/file/dragPreview';
-import { Container } from './styles';
+import React from 'react'
+import { useDragLayer } from 'react-dnd'
+import { IFile } from '../../../../../infrastructure/services/file/file.service.d'
+import { FileDragPreview } from '../files/file/dragPreview'
+import { Container } from './styles'
 
 interface Props {
-  file: IFileChild;
+  file: IFile
 }
 
 enum ItemTypes {
@@ -19,18 +19,20 @@ const DragLayer: React.FC<Props> = (props) => {
     itemType: monitor.getItemType(),
     currentOffset: monitor.getSourceClientOffset(),
     isDragging: monitor.isDragging(),
-  }));
+  }))
 
   const renderItem = (type: ItemTypes, item: any) => {
     switch (type) {
       case ItemTypes.FILE:
-        return <FileDragPreview file={props.file} currentOffset={currentOffset} />;
+        return <FileDragPreview file={props.file} currentOffset={currentOffset} />
       default:
-        return null;
+        return null
     }
-  };
+  }
 
-  return isDragging ? <Container>{renderItem(itemType as any, item)}</Container> : null;
-};
+  return isDragging ? (
+    <Container>{renderItem(itemType as any, item)}</Container>
+  ) : null
+}
 
-export { DragLayer, ItemTypes };
+export { DragLayer, ItemTypes }
