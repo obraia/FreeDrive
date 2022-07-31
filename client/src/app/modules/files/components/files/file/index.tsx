@@ -13,7 +13,7 @@ interface Props {
   onContextMenu?: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void
 }
 
-const File: React.FC<Props> = (props) => {
+const File = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
   const [{ isDragging }, dragRef] = useDrag({
     type: 'FILE',
     item: {
@@ -28,7 +28,7 @@ const File: React.FC<Props> = (props) => {
 
   return (
     <Container
-      ref={dragRef}
+      ref={ref}
       id={'file_' + props.file.id}
       isDragging={isDragging}
       className={props.className}
@@ -39,6 +39,6 @@ const File: React.FC<Props> = (props) => {
       <Name>{middleTruncateString(props.file.originalName, 15)}</Name>
     </Container>
   )
-}
+})
 
 export { File }

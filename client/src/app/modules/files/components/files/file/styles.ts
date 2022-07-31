@@ -1,13 +1,13 @@
-import styled, { css } from 'styled-components';
-import { lighten, transparentize } from 'polished';
+import styled, { css } from 'styled-components'
+import { lighten, transparentize } from 'polished'
 
 export const Name = styled.div`
   font-size: 14px;
   font-weight: normal;
   color: ${({ theme }) => theme.colors.textBackground};
-`;
+`
 
-export const Container = styled.section<{ isDragging?: Boolean }>`
+export const Container = styled.div<{ isDragging?: Boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,7 +15,8 @@ export const Container = styled.section<{ isDragging?: Boolean }>`
   position: relative;
   padding: ${({ theme }) => theme.metrics.padding};
   gap: ${({ theme }) => theme.metrics.gap};
-  border: 1px solid ${({ theme }) => transparentize(0.8, theme.colors.textBackground)};
+  border: 1px solid
+    ${({ theme }) => transparentize(0.8, theme.colors.textBackground)};
   border-radius: ${({ theme }) => theme.metrics.radius};
   background-color: ${({ theme }) => lighten(0.05, theme.colors.background)};
   color: ${({ theme }) => theme.colors.textBackground};
@@ -58,7 +59,7 @@ export const Container = styled.section<{ isDragging?: Boolean }>`
         opacity: 0;
       }
     `}
-`;
+`
 
 export const FavoriteLabel = styled.div`
   width: 30px;
@@ -74,4 +75,4 @@ export const FavoriteLabel = styled.div`
   color: ${({ theme }) => theme.colors.textBackground};
   background-color: ${({ theme }) => lighten(0.05, theme.colors.background)};
   border-radius: 50%;
-`;
+`

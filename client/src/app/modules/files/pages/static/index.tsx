@@ -62,7 +62,7 @@ const StaticPage: React.FC<Props> = (props) => {
           <FilesSection
             deleted={false}
             parentId={parentId}
-            limit={30}
+            limit={20}
             page={1}
             contextMenuItems={['LINK', 'DOWNLOAD', 'INFO', 'RENAME', 'TRASH']}
           />

@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { RefObject, useEffect, useState } from 'react'
 
 interface Props {
   initialLimit?: number
   initialPage?: number
+  loadingRef?: RefObject<unknown>
 }
 
 const useInfinityScroll = (props: Props) => {

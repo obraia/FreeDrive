@@ -61,6 +61,7 @@ userSchema.pre('save', async function (next) {
   const driveFolder = await FolderModel.create({
     userId: user.id,
     parentId: null,
+    allowDuplicate: true,
     folderName: 'Meu Drive',
   })
 

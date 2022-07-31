@@ -9,6 +9,7 @@ import { FileRepository } from '../repositories/file.repository'
 import { BadRequestException } from '../../shared/exceptions/badRequest.exception'
 import { NotfoundException } from '../../shared/exceptions/notfound.exception'
 import { IFile } from '../models/file.interface'
+import { FsHelper } from '../../../utils/helpers/fs.helper'
 
 @boundClass
 class FilesController extends BaseController<IFile> {
@@ -76,6 +77,13 @@ class FilesController extends BaseController<IFile> {
           createdAt: new Date(),
         }),
       )
+
+      if (body.replace) {
+        await this.repository.deleteByNames(
+          files.map((file) => file.originalname),
+          body.parentId,
+        )
+      }
 
       const result = await this.repository.create(filesMongo)
 
@@ -226,6 +234,28 @@ class FilesController extends BaseController<IFile> {
       res.setHeader('File-Name', zipName)
 
       return rs.pipe(res)
+    } catch (error: any) {
+      this.sendError(res, error)
+    }
+  }
+
+  public override async deleteMany(req: Request, res: Response) {
+    const ids = req.query.ids as string[]
+
+    try {
+      if (Array.from<string>(ids).some((id) => !Types.ObjectId.isValid(id))) {
+        throw new BadRequestException('Invalid ids')
+      }
+
+      const result = await this.repository.deleteMany(ids)
+
+      if (!result) {
+        throw new NotfoundException('Not found')
+      }
+
+      FsHelper.deleteFiles(ids)
+
+      return this.sendSuccess(res, result)
     } catch (error: any) {
       this.sendError(res, error)
     }

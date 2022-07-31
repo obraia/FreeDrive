@@ -123,6 +123,7 @@ function useStaticPageController(props: Props) {
     const formData = new FormData()
 
     formData.append('parentId', props.parentId)
+    formData.append('replace', 'true')
 
     for (let i = 0; i < files.length; i++) {
       formData.append('files', files[i])

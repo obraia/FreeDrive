@@ -14,10 +14,10 @@ class FilesRoutes extends BaseRoutes {
 
     this._controller = new FilesController()
 
-    const { DRIVE_DIR, THUMBS_DIR, FILES_DIR } = process.env
+    const { FILES_DIR, THUMBS_DIR } = process.env
 
     this._uploadDrive = driveEngine({
-      dest: DRIVE_DIR,
+      dest: FILES_DIR,
       thumb: {
         dest: THUMBS_DIR,
         transform: sharp().webp({ quality: 70 }).resize(200, 200),

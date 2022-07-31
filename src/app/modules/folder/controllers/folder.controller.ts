@@ -73,6 +73,21 @@ class FolderController extends BaseController<IFolder> {
     }
   }
 
+  public override async create(req: Request, res: Response) {
+    const { body, decoded } = req
+
+    try {
+      if (!decoded) {
+        throw new BadRequestException('Invalid decoded')
+      }
+
+      const result = await this.repository.create({ ...body, userId: decoded.id })
+      return this.sendCreated(res, result)
+    } catch (error: any) {
+      this.sendError(res, error)
+    }
+  }
+
   public async favorite(req: Request, res: Response) {
     const { ids, favorite } = req.body
 

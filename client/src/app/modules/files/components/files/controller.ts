@@ -18,6 +18,7 @@ import {
 } from '../../../../../infrastructure/redux/reducers/contextmenu'
 
 import {
+  addFiles,
   clearFiles,
   selectFiles,
   setContextMenuItems,
@@ -52,9 +53,11 @@ interface Raname {
 
 const useFileSectionController = (props: FilesSectionProps) => {
   const [rename, setRename] = useState<Raname>({ visible: false, file: null })
+  const [page, setPage] = useState(1)
+  const [loading, setLoading] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
 
   const { selectedFiles, files } = useSelector((state: RootState) => state.files)
-
   const dispatch = useDispatch()
 
   const {
@@ -314,34 +317,46 @@ const useFileSectionController = (props: FilesSectionProps) => {
 
   const isFileSelected = (f: IFile) => selectedFiles.includes(f.id)
 
+  const nextPage = () => {
+    setPage((p) => p + 1)
+  }
+
   useEffect(() => {
+    setLoading(true)
+
     getFiles({
       parentId: props.parentId,
       deleted: props.deleted,
       favorite: props.favorite,
-      limit: props.limit,
-      page: props.page,
+      limit: 30,
+      page: page,
     })
       .then((data) => {
         if (data.length) {
-          const newFiles = props.page > 1 ? [...files, ...data] : data
-          dispatch(setFiles(newFiles))
+          dispatch(addFiles(data))
+        } else {
+          setHasMore(false)
         }
       })
       .catch((err) => {
         console.error(err)
       })
-
-    return () => {
-      dispatch(clearFiles())
-    }
-  }, [props.parentId, props.page])
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [props.parentId, page])
 
   useEffect(() => {
     if (selectedFiles.length > 0) {
       dispatch(setContextMenuItems({ items: getContextMenuItems() }))
     }
   }, [selectedFiles, files])
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearFiles())
+    }
+  }, [])
 
   return {
     files,
@@ -352,6 +367,9 @@ const useFileSectionController = (props: FilesSectionProps) => {
     handleRename,
     toggleRename,
     rename,
+    nextPage,
+    loading,
+    hasMore,
   }
 }
 

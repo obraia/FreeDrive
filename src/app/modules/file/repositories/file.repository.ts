@@ -44,6 +44,13 @@ class FileRepository extends BaseRepository<IFile> {
       { $set: { deleted: true } },
     )
   }
+
+  async deleteByNames(names: string[], parentId: string) {
+    return await this.model.deleteMany({
+      originalName: { $in: names },
+      parentId,
+    })
+  }
 }
 
 export { FileRepository }

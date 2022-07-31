@@ -30,7 +30,7 @@ const stock = createSlice({
       state.folders = action.payload
     },
     addFiles: (state, action: PayloadAction<IFile[]>) => {
-      state.files = [...state.files, ...action.payload]
+      state.files.push(...action.payload)
     },
     addFolders: (state, action: PayloadAction<IFolder[]>) => {
       state.folders.push(...action.payload)
