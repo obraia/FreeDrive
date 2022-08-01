@@ -120,15 +120,17 @@ class BaseController<T> {
   }
 
   protected sendFile(res: Response, path: string, cb?: () => void) {
+    return res.sendFile(path, cb)
+  }
+
+  protected sendDownload(res: Response, path: string, cb?: () => void) {
     return res.download(path, cb)
   }
 
   protected sendError(res: Response, error: StatusException) {
-    return res
-      .status(error.status || httpStatusCode.INTERNAL_SERVER_ERROR)
-      .json({
-        message: error.message,
-      })
+    return res.status(error.status || httpStatusCode.INTERNAL_SERVER_ERROR).json({
+      message: error.message,
+    })
   }
 }
 

@@ -6,6 +6,7 @@ dist/*
 !dist/.git
 !dist/.gitignore
 !dist/README.md
+.env.production
 
 # client dependencies
 /client/node_modules

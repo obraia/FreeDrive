@@ -296,7 +296,7 @@ const useFileSectionController = (props: FilesSectionProps) => {
     const file = files.find((f) => f.id === id)
 
     navigator.clipboard.writeText(
-      `http://localhost:3003/api/static/files/${id}?mimetype=${file?.mimetype}`,
+      `${process.env.REACT_APP_API_ENDPOINT}/static/files/${id}?mimetype=${file?.mimetype}`,
     )
 
     dispatch(hideMenu())

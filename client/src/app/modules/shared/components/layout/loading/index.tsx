@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Ellipsis } from 'react-spinners-css'
+import { BeatLoader } from 'react-spinners'
 import { RootState } from '../../../../../../infrastructure/redux/store'
 import { Container } from './styles'
 
@@ -13,7 +13,7 @@ const Loading = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
 
   return (
     <Container ref={ref}>
-      {props.loading && <Ellipsis size={50} color={theme.colors.primary} />}
+      <BeatLoader size={10} color={theme.colors.primary} loading={props.loading} />
     </Container>
   )
 })

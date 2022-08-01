@@ -100,6 +100,12 @@ class FilesRoutes extends BaseRoutes {
       },
       {
         method: 'get',
+        path: '/files/:parentId/:originalName',
+        handler: this._controller.findByOriginalName,
+        middlewares: [],
+      },
+      {
+        method: 'get',
         path: '/files/:id',
         handler: this._controller.findById,
         middlewares: [this._authMiddleware],

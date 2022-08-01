@@ -3,7 +3,6 @@ import { Request, Response } from 'express'
 import { Types } from 'mongoose'
 import AdmZip from 'adm-zip'
 import stream from 'stream'
-
 import { BaseController } from '../../shared/controllers/base.controller'
 import { FileRepository } from '../repositories/file.repository'
 import { BadRequestException } from '../../shared/exceptions/badRequest.exception'
@@ -42,6 +41,30 @@ class FilesController extends BaseController<IFile> {
       const result = await this.repository.find(params, Number(limit), Number(page))
 
       return this.sendSuccess(res, result)
+    } catch (error: any) {
+      this.sendError(res, error)
+    }
+  }
+
+  public async findByOriginalName(req: Request, res: Response) {
+    const { parentId, originalName } = req.params
+
+    const params = {
+      parentId: new Types.ObjectId(parentId),
+      originalName: { $regex: originalName, $options: 'i' },
+    }
+
+    try {
+      const result = await this.repository.findOne(params)
+
+      if (!result) {
+        throw new NotfoundException('File not found')
+      }
+
+      res.setHeader('Content-Type', result.mimetype)
+      res.setHeader('File-Name', result.originalName)
+
+      return this.sendFile(res, result.path)
     } catch (error: any) {
       this.sendError(res, error)
     }
@@ -199,7 +222,7 @@ class FilesController extends BaseController<IFile> {
       res.setHeader('Content-Type', result.mimetype)
       res.setHeader('File-Name', result.originalName)
 
-      return this.sendFile(res, result.path)
+      return this.sendDownload(res, result.path)
     } catch (error: any) {
       this.sendError(res, error)
     }

@@ -7,7 +7,6 @@ import { ItemTypes } from '../dragLayer'
 import { File } from './file'
 import { Body, Container, Header, SortButton, Title } from './styles'
 import { Loading } from '../../../shared/components/layout/loading'
-import { useInfinityScroll } from '../../../shared/hooks/useInfinityScroll'
 
 export interface FilesSectionProps {
   parentId?: string
@@ -60,11 +59,6 @@ const FilesSection: React.FC<FilesSectionProps> = (props) => {
     },
     [loading, hasMore],
   )
-
-  const { limit, page, handleScroll } = useInfinityScroll({
-    initialLimit: 40,
-    loadingRef,
-  })
 
   const renderFiles = () => {
     return files.map((file, index) => (

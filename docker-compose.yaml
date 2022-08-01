@@ -1,8 +1,8 @@
 version: "3.9"
 services:
   db:
-    image: prismagraphql/mongo-single-replica:4.4.3-bionic
-    container_name: mongodb
+    image: mongo:latest
+    container_name: db
     restart: always
     ports:
       - ${DB_PORT}:27017
@@ -10,3 +10,32 @@ services:
       MONGO_INITDB_DATABASE: ${DB_NAME}
       MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS}
+  app:
+    container_name: app
+    restart: always
+    build:
+      context: .
+      target: production
+    ports:
+      - ${PORT}:${PORT}
+    environment:
+      # App envs
+      - PORT=${PORT}
+      - INITIAL_DIR=${INITIAL_DIR}
+      - THUMBS_DIR=${THUMBS_DIR}
+      - FILES_DIR=${FILES_DIR}
+      # Auth envs
+      - AUTH_SALT_ROUNDS=${AUTH_SALT_ROUNDS}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
+      # Database envs
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_URL=mongodb://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}
+    depends_on:
+      - db
+    links:
+      - db
