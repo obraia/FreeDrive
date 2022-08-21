@@ -9,7 +9,7 @@
     "start": "node index.js",
     "start:client": "npm run start --prefix client",
     "dev": "tsnd --tree-kill --no-notify --respawn --transpile-only index.ts --start:client",
-    "deploy": "yarn clean & yarn build & yarn build:client",
+    "deploy": "yarn clean & yarn build & yarn build:client & yarn copy",
     "build": "tsc --build",
     "build:client": "npm run build --prefix client",
     "copy": "copyfiles ./.env.production ./package.json dist",

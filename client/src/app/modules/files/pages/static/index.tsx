@@ -9,6 +9,7 @@ import { NewFolder } from '../../components/folders/new'
 import { useStaticPageController } from './controller'
 import { Container } from './styles'
 import { ReplaceFiles } from '../../components/files/replace'
+import { Uploading } from '../../components/uploading'
 
 interface Props {
   parentId?: string
@@ -21,6 +22,8 @@ const StaticPage: React.FC<Props> = (props) => {
   const { id: parentId = props.parentId || '' } = useParams()
 
   const {
+    uploading,
+    uploadingQuantity,
     newFolderModalVisible,
     toggleNewFolderModal,
     handleNewFolder,
@@ -62,14 +65,13 @@ const StaticPage: React.FC<Props> = (props) => {
           <FilesSection
             deleted={false}
             parentId={parentId}
-            limit={20}
-            page={1}
             contextMenuItems={['LINK', 'DOWNLOAD', 'INFO', 'RENAME', 'TRASH']}
           />
           {renderNewFolder()}
           {renderReplaceFile()}
           <input id={uploaderId} title="files" type="file" />
         </Container>
+        <Uploading uploading={uploading} quantity={uploadingQuantity} />
       </DndProvider>
     </Selection>
   )

@@ -2,12 +2,12 @@ import React from 'react'
 import { useParams } from 'react-router-dom'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+import { useHomePageController } from './controller'
 import { NewFolder } from '../../components/folders/new'
 import { Selection } from '../../components/selection'
 import { FilesSection } from '../../components/files'
 import { FoldersSection } from '../../components/folders'
-import { useHomePageController } from './controller'
-import { useInfinityScroll } from '../../../shared/hooks/useInfinityScroll'
+import { Uploading } from '../../components/uploading'
 import { Container } from './styles'
 
 interface Props {
@@ -21,15 +21,13 @@ const HomePage: React.FC<Props> = (props) => {
   const { id: parentId = props.parentId || '' } = useParams()
 
   const {
+    uploading,
+    uploadingQuantity,
     newFolderModalVisible,
     toggleNewFolderModal,
     handleNewFolder,
     handleContextMenu,
   } = useHomePageController({ parentId, containerId, uploaderId })
-
-  const { limit, page, handleScroll } = useInfinityScroll({
-    initialLimit: 40,
-  })
 
   const renderNewFolder = () => {
     return (
@@ -53,14 +51,12 @@ const HomePage: React.FC<Props> = (props) => {
             key={'files'}
             deleted={false}
             parentId={parentId}
-            limit={limit}
-            page={page}
             contextMenuItems={['FAVORITE', 'DOWNLOAD', 'INFO', 'RENAME', 'TRASH']}
           />
           {renderNewFolder()}
           <input id={uploaderId} title="files" type="file" />
-          {/* <Loading /> */}
         </Container>
+        <Uploading uploading={uploading} quantity={uploadingQuantity} />
       </DndProvider>
     </Selection>
   )

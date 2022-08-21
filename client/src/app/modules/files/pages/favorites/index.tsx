@@ -25,8 +25,6 @@ const FavoritesPage: React.FC = () => {
           <FilesSection
             favorite
             deleted={false}
-            limit={10}
-            page={1}
             contextMenuItems={['FAVORITE', 'DOWNLOAD', 'INFO', 'RENAME', 'TRASH']}
           />
         </Container>

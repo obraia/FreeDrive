@@ -10,6 +10,7 @@ import {
   addFiles,
   addFolders,
   clearAllSelections,
+  clearFiles,
 } from '../../reducers/files.reducer'
 
 import {
@@ -25,6 +26,8 @@ interface Props {
 
 function useHomePageController(props: Props) {
   const [newFolderModalVisible, setNewFolderModalVisible] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [uploadingQuantity, setUploadingQuantity] = useState(0)
 
   const dispatch = useDispatch()
   const { uploadFiles } = useFileService()
@@ -114,9 +117,13 @@ function useHomePageController(props: Props) {
   }
 
   const handleUpload = async (e: Event) => {
+    setUploading(true)
+
     const files = (e.target as HTMLInputElement).files
 
     if (!files) return
+
+    setUploadingQuantity(files.length)
 
     const formData = new FormData()
 
@@ -126,9 +133,17 @@ function useHomePageController(props: Props) {
       formData.append('files', files[i])
     }
 
-    uploadFiles(formData).then((data) => {
-      dispatch(addFiles(data))
-    })
+    uploadFiles(formData)
+      .then((data) => {
+        dispatch(addFiles(data.slice(0, 40)))
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+      .finally(() => {
+        setUploading(false)
+        setUploadingQuantity(0)
+      })
   }
 
   const handleNewFolder = (folderName: string) => {
@@ -185,6 +200,7 @@ function useHomePageController(props: Props) {
     return () => {
       unbindEvents()
       dispatch(clearAllSelections())
+      dispatch(clearFiles())
     }
   }, [props.parentId])
 
@@ -194,7 +210,8 @@ function useHomePageController(props: Props) {
     handleNewFolder,
     handleContextMenu,
     handleUpload,
-
+    uploading,
+    uploadingQuantity,
     contextItems,
     showContextMenu,
     hideContextMenu,

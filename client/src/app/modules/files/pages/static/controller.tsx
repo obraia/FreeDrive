@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { TbFile, TbFolder, TbFolderPlus, TbInfoCircle } from 'react-icons/tb'
 import { useFileService } from '../../../../../infrastructure/services/file/file.service'
 import { useFolderService } from '../../../../../infrastructure/services/folder/folder.service'
@@ -7,15 +7,17 @@ import { getSequencePaths } from '../../../shared/utils/formatters/paths.formatt
 import { setPage } from '../../../../../infrastructure/redux/reducers/pages'
 
 import {
-  addFiles,
   addFolders,
   clearAllSelections,
+  clearFiles,
+  setFiles,
 } from '../../reducers/files.reducer'
 
 import {
   hideMenu,
   showMenu,
 } from '../../../../../infrastructure/redux/reducers/contextmenu'
+import { RootState } from '../../../../../infrastructure/redux/store'
 
 interface Props {
   parentId: string
@@ -26,10 +28,14 @@ interface Props {
 function useStaticPageController(props: Props) {
   const [replaceFiles, setReplaceFiles] = useState<File[]>([])
   const [newFolderModalVisible, setNewFolderModalVisible] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [uploadingQuantity, setUploadingQuantity] = useState(0)
 
   const dispatch = useDispatch()
 
-  const { uploadStaticFiles } = useFileService()
+  const { files } = useSelector((state: RootState) => state.files)
+
+  const { uploadStaticFiles, getFiles } = useFileService()
   const { createFolder, getFolderById } = useFolderService()
 
   const contextItems = () => {
@@ -116,23 +122,41 @@ function useStaticPageController(props: Props) {
   }
 
   const handleUpload = async (e: Event) => {
-    const files = (e.target as HTMLInputElement).files
+    setUploading(true)
 
-    if (!files) return
+    const { files: fileList } = e.target as HTMLInputElement
+
+    if (!fileList) return
+
+    setUploadingQuantity(fileList.length)
 
     const formData = new FormData()
 
     formData.append('parentId', props.parentId)
     formData.append('replace', 'true')
 
-    for (let i = 0; i < files.length; i++) {
-      formData.append('files', files[i])
+    for (let i = 0; i < fileList.length; i++) {
+      formData.append('files', fileList[i])
       // setReplaceFiles((value) => [...value, files[i]])
     }
 
-    uploadStaticFiles(formData).then((data) => {
-      dispatch(addFiles(data))
-    })
+    try {
+      await uploadStaticFiles(formData)
+      const data = await getFiles({
+        parentId: props.parentId,
+        limit: files.length,
+        page: 1,
+        deleted: false,
+        favorite: false,
+      })
+
+      dispatch(setFiles(data))
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setUploading(false)
+      setUploadingQuantity(0)
+    }
   }
 
   const handleNewFolder = (folderName: string) => {
@@ -198,6 +222,7 @@ function useStaticPageController(props: Props) {
     return () => {
       unbindEvents()
       dispatch(clearAllSelections())
+      dispatch(clearFiles())
     }
   }, [props.parentId])
 
@@ -207,6 +232,8 @@ function useStaticPageController(props: Props) {
     handleNewFolder,
     handleContextMenu,
     handleUpload,
+    uploading,
+    uploadingQuantity,
     contextItems,
     showContextMenu,
     hideContextMenu,

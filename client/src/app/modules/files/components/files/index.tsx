@@ -12,8 +12,6 @@ export interface FilesSectionProps {
   parentId?: string
   favorite?: boolean
   deleted?: boolean
-  limit: number
-  page: number
   contextMenuItems: ContextItemsKey[]
 }
 
@@ -50,7 +48,7 @@ const FilesSection: React.FC<FilesSectionProps> = (props) => {
       if (observer.current) observer.current.disconnect()
 
       observer.current = new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && hasMore) {
           nextPage()
         }
       })
@@ -91,7 +89,7 @@ const FilesSection: React.FC<FilesSectionProps> = (props) => {
     )
   }
 
-  return files.length ? (
+  return (
     <Container>
       <Header>
         <Title>Arquivos</Title>
@@ -104,7 +102,7 @@ const FilesSection: React.FC<FilesSectionProps> = (props) => {
       <Loading ref={loadingRef} loading={loading} />
       {renderRename()}
     </Container>
-  ) : null
+  )
 }
 
 export { FilesSection }

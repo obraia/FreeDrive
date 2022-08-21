@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import { clearAllSelections } from '../../reducers/files.reducer'
+import { clearAllSelections, clearFiles } from '../../reducers/files.reducer'
 import { setPage } from '../../../../../infrastructure/redux/reducers/pages'
 
 interface Props {
@@ -29,7 +29,7 @@ function useFavoritesPageController(props: Props) {
       setPage({
         title: 'Favoritos - Free Drive',
         current: '/drive',
-        pathSequence: [{ id: '1', name: 'Favoritos' }],
+        pathSequence: [{ _id: '1', name: 'Favoritos' }],
       }),
     )
 
@@ -38,6 +38,7 @@ function useFavoritesPageController(props: Props) {
     return () => {
       unbindEvents()
       dispatch(clearAllSelections())
+      dispatch(clearFiles())
     }
   }, [])
 

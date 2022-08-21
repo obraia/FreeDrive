@@ -63,8 +63,7 @@ const Topbar: React.FC = () => {
           onMouseLeave={() => {
             setIsShowTooltip(false)
             setTimeout(() => setIsShowTooltip(true))
-          }}
-        >
+          }}>
           {<i.icon size={18} />}
           {isShowTooltip && (
             <ReactTooltip id={i.id.toString()} effect="solid" clickable>
@@ -79,8 +78,8 @@ const Topbar: React.FC = () => {
     if (!pathSequence.length) return
 
     return pathSequence.map((p, i) => (
-      <Fragment key={p.id}>
-        <TopbarButton onClick={() => navigate(`${currentPage}/${p.id}`)}>
+      <Fragment key={p._id}>
+        <TopbarButton onClick={() => navigate(`${currentPage}/${p._id}`)}>
           {p.name}
         </TopbarButton>
         {i !== pathSequence.length - 1 && <BiChevronRight />}

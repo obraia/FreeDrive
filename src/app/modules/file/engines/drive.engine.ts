@@ -62,6 +62,7 @@ class LocalStorageEngine implements multer.StorageEngine {
           .resize(1200, 1200, { fit: 'inside' })
 
         file.stream.pipe(transform).pipe(ws)
+        file.originalname = file.originalname.replace(/\.[^.]+$/, '.jpeg')
       } else {
         file.stream.pipe(ws)
       }

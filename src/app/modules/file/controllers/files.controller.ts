@@ -51,7 +51,10 @@ class FilesController extends BaseController<IFile> {
 
     const params = {
       parentId: new Types.ObjectId(parentId),
-      originalName: { $regex: originalName, $options: 'i' },
+      originalName: {
+        $regex: originalName + '\\.',
+        $options: 'i',
+      },
     }
 
     try {
@@ -101,7 +104,7 @@ class FilesController extends BaseController<IFile> {
         }),
       )
 
-      if (body.replace) {
+      if (body.replace === 'true') {
         await this.repository.deleteByNames(
           files.map((file) => file.originalname),
           body.parentId,

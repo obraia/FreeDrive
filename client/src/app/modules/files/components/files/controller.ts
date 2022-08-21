@@ -333,6 +333,7 @@ const useFileSectionController = (props: FilesSectionProps) => {
     })
       .then((data) => {
         if (data.length) {
+          setHasMore(true)
           dispatch(addFiles(data))
         } else {
           setHasMore(false)

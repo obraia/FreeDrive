@@ -36,7 +36,9 @@ const stock = createSlice({
       state.folders.push(...action.payload)
     },
     clearFiles: (state) => {
-      state.files = []
+      if (state.files.length) {
+        state.files = []
+      }
     },
     clearFolders: (state) => {
       if (state.folders.length) {

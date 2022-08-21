@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { TbFolder, TbInfoCircle } from 'react-icons/tb'
-import { clearAllSelections } from '../../reducers/files.reducer'
+import { clearAllSelections, clearFiles } from '../../reducers/files.reducer'
 import { setPage } from '../../../../../infrastructure/redux/reducers/pages'
 
 import {
   hideMenu,
   showMenu,
 } from '../../../../../infrastructure/redux/reducers/contextmenu'
+import { RootState } from '../../../../../infrastructure/redux/store'
 
 interface Props {
   containerId: string
@@ -15,8 +16,12 @@ interface Props {
 
 function useTrashPageController(props: Props) {
   const [newFolderModalVisible, setNewFolderModalVisible] = useState(false)
-
+  const { files, folders } = useSelector((state: RootState) => state.files)
   const dispatch = useDispatch()
+
+  const hasItems = files.length > 0 || folders.length > 0
+
+  console.log(files.length, folders.length)
 
   const contextItems = () => {
     return [
@@ -99,12 +104,13 @@ function useTrashPageController(props: Props) {
       setPage({
         title: 'Lixeira - Free Drive',
         current: '/trash',
-        pathSequence: [{ id: '1', name: 'Lixeira' }],
+        pathSequence: [{ _id: '1', name: 'Lixeira' }],
       }),
     )
 
     return () => {
       dispatch(clearAllSelections())
+      dispatch(clearFiles())
     }
   }, [])
 
@@ -116,6 +122,7 @@ function useTrashPageController(props: Props) {
     showContextMenu,
     hideContextMenu,
     callUpload,
+    hasItems,
   }
 }
 

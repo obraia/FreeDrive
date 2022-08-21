@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from 'styled-components'
 
 export const Pages = styled.main<{ scroll?: boolean; column?: boolean }>`
   grid-area: pages;
@@ -7,4 +7,4 @@ export const Pages = styled.main<{ scroll?: boolean; column?: boolean }>`
   height: 100%;
   display: flex;
   overflow: hidden;
-`;
+`
