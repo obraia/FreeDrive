@@ -24,6 +24,8 @@ Gerenciador de arquivos em nuvem inspirado no Google Drive, construído em React
 <h3>Baixar arquivos</h3>
 <p>É possível baixar um ou vários arquivos, sendo que se for mais de um, será gerado um arquivo compactado contendo todos os arquivos selecionados.</p>
 
+<h3>Servir arquivos estáticos</h3>
+<p>Há uma página específica para disponibilizar arquivos que serão servidos de forma estáticas, semelhante a um S3.</p>
 
 <h3>Tema escuro</h3>
 <p>É o que não podia faltar, um tema escuro :)</p>
