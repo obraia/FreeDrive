@@ -65,8 +65,7 @@ const useFileService = () => {
   }
 
   const renameFile = async (id: string, originalName: string) => {
-    const { data } = await axios.patch<IRenameResponse>('/files/rename', {
-      id,
+    const { data } = await axios.patch<IRenameResponse>(`/files/rename/${id}`, {
       originalName,
     })
     return data

@@ -356,8 +356,9 @@ const useFileSectionController = (props: FilesSectionProps) => {
   useEffect(() => {
     return () => {
       dispatch(clearFiles())
+      setPage(1)
     }
-  }, [])
+  }, [props.parentId])
 
   return {
     files,

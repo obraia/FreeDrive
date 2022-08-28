@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { TbFile, TbFolder, TbFolderPlus, TbInfoCircle } from 'react-icons/tb'
 import { useFileService } from '../../../../../infrastructure/services/file/file.service'
@@ -31,10 +31,9 @@ function useStaticPageController(props: Props) {
   const [uploading, setUploading] = useState(false)
   const [uploadingQuantity, setUploadingQuantity] = useState(0)
 
+  const totalFiles = useRef(0)
   const dispatch = useDispatch()
-
   const { files } = useSelector((state: RootState) => state.files)
-
   const { uploadStaticFiles, getFiles } = useFileService()
   const { createFolder, getFolderById } = useFolderService()
 
@@ -124,27 +123,28 @@ function useStaticPageController(props: Props) {
   const handleUpload = async (e: Event) => {
     setUploading(true)
 
-    const { files: fileList } = e.target as HTMLInputElement
+    const { files } = e.target as HTMLInputElement
 
-    if (!fileList) return
+    if (!files) return
 
-    setUploadingQuantity(fileList.length)
+    setUploadingQuantity(files.length)
 
     const formData = new FormData()
 
     formData.append('parentId', props.parentId)
     formData.append('replace', 'true')
 
-    for (let i = 0; i < fileList.length; i++) {
-      formData.append('files', fileList[i])
+    for (let i = 0; i < files.length; i++) {
+      formData.append('files', files[i])
       // setReplaceFiles((value) => [...value, files[i]])
     }
 
     try {
       await uploadStaticFiles(formData)
+
       const data = await getFiles({
         parentId: props.parentId,
-        limit: files.length,
+        limit: totalFiles.current > 30 ? totalFiles.current : 30,
         page: 1,
         deleted: false,
         favorite: false,
@@ -157,6 +157,8 @@ function useStaticPageController(props: Props) {
       setUploading(false)
       setUploadingQuantity(0)
     }
+
+    ;(e.target as HTMLInputElement).value = ''
   }
 
   const handleNewFolder = (folderName: string) => {
@@ -173,7 +175,6 @@ function useStaticPageController(props: Props) {
 
   const handleReplace = (fileName: string) => {
     setReplaceFiles((files) => files.slice(1))
-    console.log(fileName + ' substituido')
   }
 
   const clearReplaceFiles = () => {
@@ -225,6 +226,10 @@ function useStaticPageController(props: Props) {
       dispatch(clearFiles())
     }
   }, [props.parentId])
+
+  useEffect(() => {
+    totalFiles.current = files.length
+  }, [files])
 
   return {
     newFolderModalVisible,

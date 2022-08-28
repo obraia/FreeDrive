@@ -17,7 +17,7 @@ interface Props {
 
 const StaticPage: React.FC<Props> = (props) => {
   const containerId = 'static-page'
-  const uploaderId = 'home-page-uploader'
+  const uploaderId = 'static-page-uploader'
 
   const { id: parentId = props.parentId || '' } = useParams()
 

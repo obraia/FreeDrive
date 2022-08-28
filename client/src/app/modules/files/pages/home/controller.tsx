@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useEffect, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { TbFile, TbFolder, TbFolderPlus, TbInfoCircle } from 'react-icons/tb'
 import { useFolderService } from '../../../../../infrastructure/services/folder/folder.service'
 import { getSequencePaths } from '../../../shared/utils/formatters/paths.formatter'
@@ -7,16 +7,17 @@ import { useFileService } from '../../../../../infrastructure/services/file/file
 import { setPage } from '../../../../../infrastructure/redux/reducers/pages'
 
 import {
-  addFiles,
   addFolders,
   clearAllSelections,
   clearFiles,
+  setFiles,
 } from '../../reducers/files.reducer'
 
 import {
   hideMenu,
   showMenu,
 } from '../../../../../infrastructure/redux/reducers/contextmenu'
+import { RootState } from '../../../../../infrastructure/redux/store'
 
 interface Props {
   parentId: string
@@ -29,8 +30,10 @@ function useHomePageController(props: Props) {
   const [uploading, setUploading] = useState(false)
   const [uploadingQuantity, setUploadingQuantity] = useState(0)
 
+  const totalFiles = useRef(0)
   const dispatch = useDispatch()
-  const { uploadFiles } = useFileService()
+  const { files } = useSelector((state: RootState) => state.files)
+  const { uploadFiles, getFiles } = useFileService()
   const { createFolder, getFolderById } = useFolderService()
 
   const contextItems = () => {
@@ -119,7 +122,7 @@ function useHomePageController(props: Props) {
   const handleUpload = async (e: Event) => {
     setUploading(true)
 
-    const files = (e.target as HTMLInputElement).files
+    const { files } = e.target as HTMLInputElement
 
     if (!files) return
 
@@ -133,17 +136,26 @@ function useHomePageController(props: Props) {
       formData.append('files', files[i])
     }
 
-    uploadFiles(formData)
-      .then((data) => {
-        dispatch(addFiles(data.slice(0, 40)))
+    try {
+      await uploadFiles(formData)
+
+      const data = await getFiles({
+        parentId: props.parentId,
+        limit: totalFiles.current > 30 ? totalFiles.current : 30,
+        page: 1,
+        deleted: false,
+        favorite: false,
       })
-      .catch((err) => {
-        console.log(err)
-      })
-      .finally(() => {
-        setUploading(false)
-        setUploadingQuantity(0)
-      })
+
+      dispatch(setFiles(data))
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setUploading(false)
+      setUploadingQuantity(0)
+    }
+
+    ;(e.target as HTMLInputElement).value = ''
   }
 
   const handleNewFolder = (folderName: string) => {
@@ -203,6 +215,10 @@ function useHomePageController(props: Props) {
       dispatch(clearFiles())
     }
   }, [props.parentId])
+
+  useEffect(() => {
+    totalFiles.current = files.length
+  }, [files])
 
   return {
     newFolderModalVisible,

@@ -3,7 +3,7 @@ import { Response, Request } from 'express'
 import { Types } from 'mongoose'
 import AdmZip from 'adm-zip'
 import stream from 'stream'
-
+import mime from 'mime-types'
 import { BaseController } from '../../shared/controllers/base.controller'
 import { FolderRepository } from '../repositories/folder.repository'
 import { BadRequestException } from '../../shared/exceptions/badRequest.exception'
@@ -218,7 +218,11 @@ class FolderController extends BaseController<IFolder> {
 
       allFolders.forEach((folder) => {
         folder.files.forEach((file: any) => {
-          zip.addLocalFile(file.path, folder.path, file.originalName)
+          zip.addLocalFile(
+            file.path,
+            folder.path,
+            `${file.originalName}.${mime.extension(file.mimetype)}`,
+          )
         })
       })
 

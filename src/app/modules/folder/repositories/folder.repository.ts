@@ -84,7 +84,7 @@ class FolderRepository extends BaseRepository<IFolder> {
                 deleted: false,
               },
             },
-            { $project: { originalName: 1, path: 1 } },
+            { $project: { originalName: 1, mimetype: 1, path: 1 } },
           ],
           as: 'files',
         },

@@ -17,13 +17,7 @@ const TrashPage: React.FC = () => {
       <DndProvider backend={HTML5Backend}>
         <Container id={containerId} onContextMenu={handleContextMenu}>
           <FoldersSection deleted contextMenuItems={['RESTORE', 'DELETE', 'INFO']} />
-          <FilesSection
-            deleted
-            limit={10}
-            page={1}
-            contextMenuItems={['RESTORE', 'DELETE', 'INFO']}
-          />
-          <input id="uploader" title="files" type="file" />
+          <FilesSection deleted contextMenuItems={['RESTORE', 'DELETE', 'INFO']} />
         </Container>
       </DndProvider>
     </Selection>

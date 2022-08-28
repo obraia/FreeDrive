@@ -8,6 +8,7 @@ export const Name = styled.div`
 `
 
 export const Container = styled.div<{ isDragging?: Boolean }>`
+  aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -44,6 +45,9 @@ export const Container = styled.div<{ isDragging?: Boolean }>`
   > svg {
     width: 100%;
     height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     object-fit: cover;
     border-radius: ${({ theme }) => theme.metrics.inner_radius};
   }

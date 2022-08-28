@@ -1,16 +1,18 @@
 const truncateString = (text: string, length: number): string => {
-  return text && text.length >= length + 3 ? text.substring(0, length).replace(/\s+/g, ' ').concat('...') : text;
-};
+  return text && text.length >= length + 3
+    ? text.substring(0, length).replace(/\s+/g, ' ').concat('...')
+    : text
+}
 
 const middleTruncateString = (text: string, length: number): string => {
   if (text && text.length >= length + 3) {
-    const exedent = text.length - length;
-    const middle = Math.floor(text.length / 2);
-    const midleExedent = Math.floor(exedent / 2);
-    return text.substring(0, middle - midleExedent).concat('...') + text.substring(text.length - midleExedent);
+    const half = Math.floor(length / 2)
+    const first = text.substring(0, half)
+    const second = text.substring(text.length - half, text.length)
+    return first.concat('...').concat(second)
   }
 
-  return text;
-};
+  return text
+}
 
-export { truncateString, middleTruncateString };
+export { truncateString, middleTruncateString }

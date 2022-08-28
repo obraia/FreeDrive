@@ -38,12 +38,14 @@ export const Form = styled.form`
 `
 
 export const RememberMe = styled.label<{ active?: boolean }>`
+  width: fit-content;
   position: relative;
   display: flex;
   align-items: center;
   margin: 5px 0;
   gap: 5px;
   color: ${({ theme }) => theme.colors.textBackground};
+  white-space: nowrap;
   font-size: 14px;
   transition: 0.2s;
   cursor: pointer;
@@ -57,14 +59,11 @@ export const RememberMe = styled.label<{ active?: boolean }>`
     justify-content: center;
     border-radius: 5px;
     background-color: ${({ theme }) => theme.colors.background};
-    outline: 1px solid
-      ${({ theme }) => transparentize(0.8, theme.colors.textBackground)};
 
     ${({ active }) =>
       active &&
       css`
         background-color: ${({ theme }) => theme.colors.primary};
-        outline: none;
       `}
   }
 
@@ -79,8 +78,6 @@ export const RememberMe = styled.label<{ active?: boolean }>`
     justify-content: center;
     border-radius: 4px;
     background-color: ${({ theme }) => theme.colors.textPrimary};
-    outline: 1px solid
-      ${({ theme }) => transparentize(0.8, theme.colors.textBackground)};
     transition: 0.2s;
 
     ${({ active }) =>
@@ -88,7 +85,6 @@ export const RememberMe = styled.label<{ active?: boolean }>`
       css`
         left: auto;
         transform: translateX(150%);
-        outline: none;
       `}
   }
 `

@@ -21,8 +21,6 @@ function useTrashPageController(props: Props) {
 
   const hasItems = files.length > 0 || folders.length > 0
 
-  console.log(files.length, folders.length)
-
   const contextItems = () => {
     return [
       {

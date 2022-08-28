@@ -218,14 +218,14 @@ function useFolderSectionController(props: Props) {
     dispatch(hideMenu())
   }
 
-  const handleRename = (originalName: string) => {
+  const handleRename = (folderName: string) => {
     const { folder } = rename
 
     if (!folder) return
 
-    renameFolder(folder.id, originalName).then(() => {
+    renameFolder(folder.id, folderName).then(() => {
       const newFolders = folders.map((f) =>
-        f.id === folder.id ? { ...f, originalName } : f,
+        f.id === folder.id ? { ...f, folderName } : f,
       )
 
       dispatch(setFolders(newFolders))

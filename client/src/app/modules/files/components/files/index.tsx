@@ -45,10 +45,13 @@ const FilesSection: React.FC<FilesSectionProps> = (props) => {
   const lastFileElementRef = useCallback(
     (node: HTMLDivElement) => {
       if (loading) return
+
       if (observer.current) observer.current.disconnect()
 
       observer.current = new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting && hasMore) {
+        const lastImg = node?.firstElementChild as HTMLImageElement
+
+        if (entry.isIntersecting && hasMore && lastImg?.complete) {
           nextPage()
         }
       })
@@ -74,9 +77,11 @@ const FilesSection: React.FC<FilesSectionProps> = (props) => {
   const renderRename = () => {
     if (!rename?.visible || !rename.file) return null
 
-    const parts = rename.file.originalName.split('.')
-    const extension = parts.pop()
-    const name = parts.join('.')
+    // const parts = rename.file.originalName.split('.')
+    // parts.pop()
+    // const name = parts.join('.')
+
+    const name = rename.file.originalName
 
     return (
       <Rename

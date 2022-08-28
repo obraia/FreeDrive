@@ -1,4 +1,4 @@
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle } from 'styled-components'
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -8,6 +8,10 @@ const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
     user-select: none;
     font-family: Poppins, sans-serif;
+  }
+
+  input {
+    user-select: text;
   }
 
   html {
@@ -51,7 +55,8 @@ const GlobalStyle = createGlobalStyle`
   input:-webkit-autofill:focus, 
   input:-webkit-autofill:active{
     transition: background-color 5000s ease-in-out 0s;
-    -webkit-text-fill-color: ${({ theme }) => theme.colors.textBackground} !important;
+    -webkit-text-fill-color: ${({ theme }) =>
+      theme.colors.textBackground} !important;
   }
 
   /* Inverter cor do ícone de calendário do input date no chrome */
@@ -59,6 +64,6 @@ const GlobalStyle = createGlobalStyle`
     ${({ theme }) => theme.title === 'dark' && 'filter: invert(0.8);'}
   }
 
-`;
+`
 
-export { GlobalStyle };
+export { GlobalStyle }

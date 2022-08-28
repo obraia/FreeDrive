@@ -3,6 +3,7 @@ import { Request, Response } from 'express'
 import { Types } from 'mongoose'
 import AdmZip from 'adm-zip'
 import stream from 'stream'
+import mime from 'mime-types'
 import { BaseController } from '../../shared/controllers/base.controller'
 import { FileRepository } from '../repositories/file.repository'
 import { BadRequestException } from '../../shared/exceptions/badRequest.exception'
@@ -51,10 +52,7 @@ class FilesController extends BaseController<IFile> {
 
     const params = {
       parentId: new Types.ObjectId(parentId),
-      originalName: {
-        $regex: originalName + '\\.',
-        $options: 'i',
-      },
+      originalName,
     }
 
     try {
@@ -218,12 +216,11 @@ class FilesController extends BaseController<IFile> {
         throw new NotfoundException('Not found')
       }
 
-      res.setHeader(
-        'Content-disposition',
-        'attachment; filename=' + result.originalName,
-      )
+      const fileName = `${result.originalName}.${mime.extension(result.mimetype)}`
+
+      res.setHeader('Content-disposition', 'attachment; filename=' + fileName)
       res.setHeader('Content-Type', result.mimetype)
-      res.setHeader('File-Name', result.originalName)
+      res.setHeader('File-Name', fileName)
 
       return this.sendDownload(res, result.path)
     } catch (error: any) {
@@ -250,7 +247,11 @@ class FilesController extends BaseController<IFile> {
       const zipName = `freedrive_${Date.now()}.zip`
 
       results.forEach((result) => {
-        zip.addLocalFile(result.path, undefined, result.originalName)
+        zip.addLocalFile(
+          result.path,
+          undefined,
+          `${result.originalName}.${mime.extension(result.mimetype)}`,
+        )
       })
 
       rs.end(zip.toBuffer())

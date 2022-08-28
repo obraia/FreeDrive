@@ -11,7 +11,16 @@ const Preview: React.FC<Props> = (props) => {
 
   const options = (type: string, src: string) =>
     ({
-      image: <img src={src} alt="Preview" />,
+      image: (
+        <img
+          src={src}
+          alt="Preview"
+          onError={({ currentTarget }) => {
+            currentTarget.onerror = null
+            currentTarget.src = '/images/notfound.png'
+          }}
+        />
+      ),
       video: <video src={src} controls preload="none" />,
       audio: <audio src={src} controls />,
       pdf: <iframe src={src} title="pdf" />,
