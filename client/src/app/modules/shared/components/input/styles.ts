@@ -1,11 +1,12 @@
 import styled from 'styled-components';
-import { transparentize } from 'polished';
+import { darken, transparentize } from 'polished';
 
 export const Container = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
   gap: ${({ theme }) => theme.metrics.gap};
 `;
 
@@ -51,3 +52,23 @@ export const InputStyle = styled.input<{ error?: boolean }>`
 
   ${({ theme, error }) => error && `border: 2px solid ${theme.colors.error};`}
 `;
+
+export const RightButton = styled.button`
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  right: 0;
+  border: 0;
+  border-radius: ${({ theme }) => theme.metrics.inner_radius};
+  background-color: ${({ theme }) => theme.colors.background};
+  color: ${({ theme }) => theme.colors.textBackground};
+  font-size: 20px;
+  cursor: pointer;
+
+  &:hover {
+    color: ${({ theme }) => darken(0.05, theme.colors.textBackground) };
+  }
+`;  
