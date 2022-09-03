@@ -50,10 +50,12 @@ class MongoDB {
       return process.env.DB_URL
     }
 
-    const host = process.env.DB_HOST
-    const port = process.env.DB_PORT
-    const user = process.env.DB_USER
-    const pass = process.env.DB_PASS
+    const {
+      DB_HOST: host,
+      DB_PORT: port,
+      DB_USER: user,
+      DB_PASS: pass,
+    } = process.env
 
     if (!host || !port || !user || !pass) {
       throw new Error('[MongoDB] Missing environment variables')
