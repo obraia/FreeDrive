@@ -18,7 +18,7 @@ class FilesController extends BaseController<IFile> {
   }
 
   public override async find(req: Request, res: Response) {
-    const { parentId, deleted, favorite, limit, page } = req.query
+    const { parentId, deleted, favorite, originalName, limit, page } = req.query
 
     const params = {} as any
 
@@ -36,6 +36,10 @@ class FilesController extends BaseController<IFile> {
 
     if (req.decoded) {
       params.userId = req.decoded.id
+    }
+
+    if(originalName) {
+      params.originalName = { $regex: originalName, $options: 'i' }
     }
 
     try {

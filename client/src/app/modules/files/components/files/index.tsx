@@ -12,6 +12,7 @@ export interface FilesSectionProps {
   parentId?: string
   favorite?: boolean
   deleted?: boolean
+  originalName?: string
   contextMenuItems: ContextItemsKey[]
 }
 

@@ -328,6 +328,37 @@ const useFileSectionController = (props: FilesSectionProps) => {
       parentId: props.parentId,
       deleted: props.deleted,
       favorite: props.favorite,
+      originalName: props.originalName,
+      limit: 30,
+      page: 1,
+    })
+      .then((data) => {
+        if (data.length === 30) {
+          setHasMore(true)
+        } else {
+          setHasMore(false)
+        }
+
+        dispatch(setFiles(data))
+      })
+      .catch((err) => {
+        console.error(err)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [props.parentId, props.originalName])
+
+  useEffect(() => {
+    if (page === 1) return
+
+    setLoading(true)
+
+    getFiles({
+      parentId: props.parentId,
+      deleted: props.deleted,
+      favorite: props.favorite,
+      originalName: props.originalName,
       limit: 30,
       page: page,
     })

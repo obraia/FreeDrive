@@ -79,7 +79,7 @@ const Topbar: React.FC = () => {
 
     return pathSequence.map((p, i) => (
       <Fragment key={p._id}>
-        <TopbarButton onClick={() => navigate(`${currentPage}/${p._id}`)}>
+        <TopbarButton onClick={() => p._id ? navigate(`${currentPage}/${p._id}`) : {}}>
           {p.name}
         </TopbarButton>
         {i !== pathSequence.length - 1 && <BiChevronRight />}

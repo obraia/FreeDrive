@@ -9,15 +9,16 @@ export interface IFile {
   path: string
   favorite: boolean
   deleted: boolean
-  createdAt: Date
-  updatedAt?: Date
-  deletedAt?: Date
+  createdAt: string
+  updatedAt?: string
+  deletedAt?: string
 }
 
 export interface IGetFilesParams {
   parentId?: string
   favorite?: boolean
   deleted?: boolean
+  originalName?: string
   limit: number
   page: number
 }

@@ -3,7 +3,6 @@ declare global {
     interface ProcessEnv {
       PORT: string
       NODE_ENV: 'development' | 'production'
-      APP_URL: string
       INITIAL_DIR: string
       DRIVE_DIR: string
       THUMBS_DIR: string

@@ -18,6 +18,7 @@ import { Disk } from '../../../../infrastructure/services/file/file.service'
 import { useUserService } from '../../../../infrastructure/services/user/user.service'
 import { setUser } from '../../../../infrastructure/redux/reducers/auth'
 import { useFolderService } from '../../../../infrastructure/services/folder/folder.service'
+import { SearchPage } from '../pages/search'
 
 const FilesRoutes: React.FC = () => {
   const [disk, setDisk] = useState<Disk>({ total: 1, used: 1 })
@@ -31,7 +32,7 @@ const FilesRoutes: React.FC = () => {
   const { getDiskSpace } = useFolderService()
 
   const isFilesRoute = () => {
-    return ['/drive', '/favorites', '/trash', '/static'].some((route) =>
+    return ['/drive', '/favorites', '/trash', '/static', '/search'].some((route) =>
       pathname.includes(route),
     )
   }
@@ -73,6 +74,7 @@ const FilesRoutes: React.FC = () => {
             element={<StaticPage parentId={user.staticFolder.id} />}>
             <Route path={':id'} element={<StaticPage />} />
           </Route>
+          <Route path="/search" element={<SearchPage />} />
           <Route path="/trash" element={<TrashPage />} />
         </Routes>
       </Pages>

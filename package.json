@@ -7,17 +7,17 @@
   "license": "MIT",
   "scripts": {
     "start": "node index.js",
-    "start:client": "npm run start --prefix client",
+    "start:client": "npm start --prefix client",
     "dev": "tsnd --tree-kill --no-notify --respawn --transpile-only index.ts --start:client",
-    "deploy": "yarn clean & yarn build & yarn build:client & yarn copy",
-    "build": "tsc --build",
-    "build:client": "npm run build --prefix client",
-    "copy": "copyfiles ./.env.production ./package.json dist",
-    "clean": "tsc --build --clean"
-  },
-  "prisma": {
-    "schema": "./src/infrastructure/database/prisma/schema.prisma",
-    "seed": "ts-node  ./src/infrastructure/database/prisma/seed.ts"
+    "build": "tsc --build && npm run build --prefix client",
+    "build:prd": "tsc --build && npm run build:prd --prefix client",
+    "rename:env": "node -e \"require('fs').rename('./dist/.env.production', './dist/.env', (err) => {})\"",
+    "copy": "copyfiles ./.env ./package.json ./ecosystem.config.js dist",
+    "copy:prd": "copyfiles ./.env.production ./package.json ./ecosystem.config.js dist && npm run rename:env",
+    "deploy": "npm run clean && npm run build && npm run copy",
+    "deploy:prd": "npm run clean && npm run build:prd && npm run copy:prd",
+    "clean": "tsc --build --clean",
+    "install:prd": "npm install --production"
   },
   "devDependencies": {
     "@types/adm-zip": "^0.5.0",
@@ -35,6 +35,7 @@
     "@types/sharp": "^0.30.4",
     "@types/uuid": "^8.3.1",
     "copyfiles": "^2.4.1",
+    "env-cmd": "^10.1.0",
     "nodemon": "^2.0.12",
     "prisma": "^3.9.1",
     "ts-node": "^10.2.1",

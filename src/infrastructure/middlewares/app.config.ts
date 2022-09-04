@@ -43,10 +43,7 @@ class AppConfig {
   }
 
   private pages(): void {
-    const dir =
-      this.env === 'production'
-        ? path.join(__dirname, '..', '..', '..', 'public')
-        : path.join(__dirname, '..', '..', '..', 'dist', 'public')
+    const dir = path.join(__dirname, '..', '..', '..', 'public')
 
     this.app.use(express.static(dir))
 
