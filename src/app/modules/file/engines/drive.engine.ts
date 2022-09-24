@@ -62,7 +62,6 @@ class LocalStorageEngine implements multer.StorageEngine {
           .resize(1200, 1200, { fit: 'inside' })
 
         file.stream.pipe(transform).pipe(ws)
-        file.originalname = file.originalname.replace(/\.[^.]+$/, '')
         file.mimetype = 'image/jpeg'
       } else {
         file.stream.pipe(ws)
@@ -80,7 +79,7 @@ class LocalStorageEngine implements multer.StorageEngine {
       ws.on('close', () => {
         cb(null, {
           fieldname: file.fieldname,
-          originalname: file.originalname,
+          originalname: file.originalname.replace(/\.[^.]+$/, ''),
           mimetype: file.mimetype,
           destination: this._props.dest,
           filename: filename,

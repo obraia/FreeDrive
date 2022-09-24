@@ -15,7 +15,7 @@ class AppConfig {
     this.config()
     this.router()
     this.pages()
-    this.storage()
+    this.static()
   }
 
   public getApp() {
@@ -25,13 +25,13 @@ class AppConfig {
   private config(): void {
     this.app.use(helmet({ contentSecurityPolicy: false }))
     this.app.use(compression())
-    this.app.use(express.json())
-    this.app.use(express.urlencoded({ extended: false }))
+    this.app.use(express.json({ limit: '300mb'}))
+    this.app.use(express.urlencoded({ limit: '300mb', extended: false}))
 
     this.app.use(
       cors({
         credentials: true,
-        origin: 'http://localhost:3000',
+        origin: ['http://192.168.1.3:3000', 'http://localhost:3000'],
         exposedHeaders: ['File-Name'],
       }),
     )
@@ -54,21 +54,9 @@ class AppConfig {
     })
   }
 
-  private storage(): void {
-    const thumbsDir = String(process.env.THUMBS_DIR)
+  private static(): void {
     const filesDir = String(process.env.FILES_DIR)
-
-    this.app.use('/api/static/thumbs', express.static(thumbsDir))
-
-    this.app.use('/api/static/files', (req, res, next) => {
-      const { mimetype } = req.query
-
-      if (mimetype) {
-        res.setHeader('Content-Type', String(mimetype))
-      }
-
-      express.static(filesDir)(req, res, next)
-    })
+    this.app.use('/api/static', express.static(filesDir))
   }
 }
 
