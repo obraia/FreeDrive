@@ -47,7 +47,7 @@ const Preview: React.FC<Props> = (props) => {
   return (
     options(
       type,
-      process.env.REACT_APP_API_ENDPOINT + '/static/thumbs/' + props.file.fileName,
+      process.env.REACT_APP_STATIC_ENDPOINT + '/thumb/' + props.file.fileName,
     ) || <TbFile size={36} />
   )
 }

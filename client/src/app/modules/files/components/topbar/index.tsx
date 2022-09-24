@@ -5,8 +5,7 @@ import ReactTooltip from 'react-tooltip'
 import { IconType } from 'react-icons'
 import { BiChevronRight, BiSelectMultiple } from 'react-icons/bi'
 import { RootState } from '../../../../../infrastructure/redux/store'
-import { Row } from '../../../shared/components/layout/row'
-import { Container, Separator, TopbarButton } from './styles'
+import { Container, Separator, TopbarButton, Path, RowButtons } from './styles'
 
 export interface TopbarItem {
   id: number
@@ -89,11 +88,11 @@ const Topbar: React.FC = () => {
 
   return (
     <Container>
-      <Row>{renderPath()}</Row>
-      <Row>
+      <Path>{renderPath()}</Path>
+      <RowButtons>
         {renderItems()}
         {renderTotalSelected()}
-      </Row>
+      </RowButtons>
     </Container>
   )
 }

@@ -20,6 +20,10 @@ export const Title = styled.h1`
   font-size: 24px;
   font-weight: lighter;
   color: ${({ theme }) => theme.colors.textBackground};
+
+  @media (max-width: ${({ theme }) => theme.metrics.desktop_small}) {
+    display: none;
+  }
 `;
 
 export const HeaderButton = styled(Button)<{ active?: boolean }>`

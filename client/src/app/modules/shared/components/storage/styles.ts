@@ -11,12 +11,21 @@ export const Container = styled.div`
   gap: ${({ theme }) => theme.metrics.gap};
   border-radius: ${({ theme }) => theme.metrics.radius};
   background-color: ${({ theme }) => lighten(0.05, theme.colors.background)};
+  transition: .2s;
+
+  @media (max-width: ${({ theme }) => theme.metrics.desktop_small}) {
+    width: 52px;
+  }
 `
 
 export const Text = styled.p`
   font-size: 13px;
   font-weight: bold;
   color: ${({ theme }) => theme.colors.textBackground};
+
+  @media (max-width: ${({ theme }) => theme.metrics.desktop_small}) {
+    display: none;
+  }
 `
 
 export const Progress = styled.div<{ progress: string }>`
@@ -44,4 +53,8 @@ export const Progress = styled.div<{ progress: string }>`
 export const TextInfo = styled.p`
   font-size: 13px;
   color: ${({ theme }) => theme.colors.textBackground};
+
+  @media (max-width: ${({ theme }) => theme.metrics.desktop_small}) {
+    display: none;
+  }
 `

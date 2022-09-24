@@ -11,6 +11,11 @@ export const Container = styled.div`
   gap: ${({ theme }) => theme.metrics.gap};
   border-radius: ${({ theme }) => theme.metrics.radius};
   background-color: ${({ theme }) => lighten(0.05, theme.colors.background)};
+  transition: .2s;
+
+  @media (max-width: ${({ theme }) => theme.metrics.desktop_small}) {
+    width: 52px;
+  }
 `;
 
 export const MenuItems = styled.nav`
@@ -33,7 +38,9 @@ export const MenuItem = styled(Link)`
   border-radius: ${({ theme }) => theme.metrics.inner_radius};
   color: ${({ theme }) => theme.colors.textBackground};
   font-size: 13px;
+  white-space: nowrap;
   text-decoration: none;
+  overflow: hidden;
   cursor: pointer;
 
   &.active {
@@ -41,4 +48,20 @@ export const MenuItem = styled(Link)`
     background-color: ${({ theme }) => transparentize(0.8, theme.colors.primary)};
     pointer-events: none;
   }
+
+  svg {
+    min-width: 20px;
+  }
+
+  @media (max-width: ${({ theme }) => theme.metrics.desktop_small}) {
+    justify-content: center;
+
+    span {
+      display: none;
+    }
+  }
+`;
+
+export const MenuItemName = styled.span`
+
 `;

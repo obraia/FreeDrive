@@ -7,6 +7,12 @@ import reportWebVitals from './reportWebVitals'
 import App from './App'
 
 const container = document.getElementById('app')
+
+window.addEventListener('resize', (e) => {
+ if(!container) return
+  container.style.height = `${window.innerHeight}px`
+})
+
 createRoot(container!).render(
   // <React.StrictMode>
   <Provider store={store}>

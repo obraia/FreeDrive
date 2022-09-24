@@ -2,7 +2,7 @@ import React from 'react'
 import { TbFile, TbHeart, TbHome, TbTrash } from 'react-icons/tb'
 import { useLocation } from 'react-router-dom'
 
-import { Container, MenuItem, MenuItems } from './styles'
+import { Container, MenuItem, MenuItemName, MenuItems } from './styles'
 
 const Menu: React.FC = () => {
   const { pathname } = useLocation()
@@ -42,7 +42,7 @@ const Menu: React.FC = () => {
         to={i.path}
       >
         {<i.icon size={20} />}
-        {i.name}
+        <MenuItemName>{i.name}</MenuItemName>
       </MenuItem>
     ))
   }

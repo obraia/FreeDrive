@@ -4,6 +4,7 @@ import { Button } from '../button/styles'
 
 export const Container = styled.div<{ width?: string }>`
   width: ${({ width }) => width || '100%'};
+  max-width: 525px;
   height: 100%;
   display: flex;
   align-items: center;

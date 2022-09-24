@@ -35,6 +35,10 @@ export const Form = styled.form`
   border: 1px solid
     ${({ theme }) => transparentize(0.8, theme.colors.textBackground)};
   background-color: ${({ theme }) => lighten(0.05, theme.colors.background)};
+
+  @media (max-width: ${({ theme }) => theme.metrics.desktop_small}) {
+    width: 100%;
+  }
 `
 
 export const RememberMe = styled.label<{ active?: boolean }>`

@@ -21,7 +21,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   #app {
-    height: 100vh;
+    height: ${window.innerHeight}px;
     display: flex;
     flex-direction: column;
     background-color: ${({ theme }) => theme.colors.background};
@@ -62,6 +62,15 @@ const GlobalStyle = createGlobalStyle`
   /* Inverter cor do ícone de calendário do input date no chrome */
   ::-webkit-calendar-picker-indicator {
     ${({ theme }) => theme.title === 'dark' && 'filter: invert(0.8);'}
+  }
+
+  input[type="search"] {
+    &::-webkit-search-decoration,
+    &::-webkit-search-cancel-button,
+    &::-webkit-search-results-button,
+    &::-webkit-search-results-decoration {
+      display: none;
+    }
   }
 
 `

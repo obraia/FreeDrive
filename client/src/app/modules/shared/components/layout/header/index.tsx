@@ -69,8 +69,9 @@ const Header: React.FC = () => {
   return (
     <Container>
       <Title onClick={handleThemeChange}>FreeDrive</Title>
+
       <SearchBar
-        width="35%"
+        width="100%"
         placeholder="Pesquisar no FreeDrive"
         defaultValue={searchParams.get('q') || ''}
         onChange={handleChange}
@@ -79,10 +80,6 @@ const Header: React.FC = () => {
       />
 
       <RightElements>
-        <HeaderButton>
-          <TbHelp size={22} color={theme.colors.textBackground} />
-        </HeaderButton>
-
         <HeaderButton>
           <TbSettings size={22} color={theme.colors.textBackground} />
         </HeaderButton>
