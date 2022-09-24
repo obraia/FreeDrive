@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 export const Scroll = styled.div`
   ::-webkit-scrollbar {
-    width: 16px;
+    width: 14px;
   }
 
   ::-webkit-scrollbar-track {

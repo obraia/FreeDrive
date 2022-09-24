@@ -30,7 +30,7 @@ class AuthController extends BaseController<IUser> {
         throw new BadRequestException('Invalid password')
       }
 
-      const token = await JWTHelper.encode({
+      const token = JWTHelper.encode({
         id: user._id,
       })
 

@@ -36,7 +36,7 @@ export const Form = styled.form`
     ${({ theme }) => transparentize(0.8, theme.colors.textBackground)};
   background-color: ${({ theme }) => lighten(0.05, theme.colors.background)};
 
-  @media (max-width: ${({ theme }) => theme.metrics.desktop_small}) {
+  @media (max-width: ${({ theme }) => theme.metrics.mobile_large}) {
     width: 100%;
   }
 `

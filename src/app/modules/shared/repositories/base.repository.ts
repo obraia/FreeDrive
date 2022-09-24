@@ -1,4 +1,4 @@
-import { FilterQuery, Model } from 'mongoose'
+import { FilterQuery, Model, UpdateQuery } from 'mongoose'
 
 class BaseRepository<T> {
   [x: string]: any
@@ -9,8 +9,8 @@ class BaseRepository<T> {
     return new this.model(data)
   }
 
-  findOne(params: FilterQuery<T>) {
-    return this.model.findOne(params).exec()
+  findOne(params: FilterQuery<T>, projection?: string) {
+    return this.model.findOne(params, projection).exec()
   }
 
   find(params: FilterQuery<T>, limit: number, page: number) {
@@ -25,17 +25,25 @@ class BaseRepository<T> {
     return this.model.find(params).exec()
   }
 
-  findById(id: string, populate?: string[]) {
-    return populate
-      ? this.model.findById(id).populate(populate)
-      : this.model.findById(id)
+  findById(id: string, options: { populate?: string[]; projection?: string[] }) {
+    const result = this.model.findById(id)
+
+    if (options.populate) {
+      return result.populate(options.populate)
+    }
+
+    if (options.projection) {
+      return result.select(options.projection)
+    }
+
+    return result.exec()
   }
 
   create(data: Omit<T, '_id'> | Omit<T, '_id'>[]) {
     return this.model.create(data)
   }
 
-  update(id: string, data: T) {
+  update(id: string, data: UpdateQuery<T>) {
     return this.model.findByIdAndUpdate(id, data, { new: true }).exec()
   }
 

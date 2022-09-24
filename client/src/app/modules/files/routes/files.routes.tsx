@@ -65,13 +65,13 @@ const FilesRoutes: React.FC = () => {
 
       <Pages>
         <Routes>
-          <Route path="/drive" element={<HomePage parentId={user.driveFolder.id} />}>
+          <Route path="/drive" element={<HomePage parentId={user.driveFolderId} />}>
             <Route path={':id'} element={<HomePage />} />
           </Route>
           <Route path="/favorites" element={<FavoritesPage />} />
           <Route
             path="/static"
-            element={<StaticPage parentId={user.staticFolder.id} />}>
+            element={<StaticPage parentId={user.staticFolderId} />}>
             <Route path={':id'} element={<StaticPage />} />
           </Route>
           <Route path="/search" element={<SearchPage />} />

@@ -21,10 +21,9 @@ class UserController extends BaseController<IUser> {
         throw new BadRequestException('Invalid id')
       }
 
-      const result = await this.repository.findById(id, [
-        'driveFolder',
-        'staticFolder',
-      ])
+      const result = await this.repository.findById(id, {
+        populate: ['driveFolder', 'staticFolder'],
+      })
 
       if (!result) {
         throw new NotfoundException('Not found')
@@ -44,10 +43,16 @@ class UserController extends BaseController<IUser> {
         throw new BadRequestException('User cannot be decoded')
       }
 
-      const result = await this.repository.findById(decoded.id, [
-        'driveFolder',
-        'staticFolder',
-      ])
+      const result = await this.repository.findById(decoded.id, {
+        projection: [
+          'id',
+          'name',
+          'username',
+          'email',
+          'driveFolderId',
+          'staticFolderId',
+        ]
+      })
 
       if (!result) {
         throw new NotfoundException('Not found')

@@ -7,8 +7,10 @@ export interface IUser {
   deleted: boolean
   createdAt: Date
   updatedAt: Date
-  driveFolder: DriveFolder
-  staticFolder: StaticFolder
+  driveFolderId?: string
+  staticFolderId?: string
+  driveFolder?: DriveFolder
+  staticFolder?: StaticFolder
 }
 
 export interface DriveFolder {
