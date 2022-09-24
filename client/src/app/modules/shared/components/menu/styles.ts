@@ -16,6 +16,10 @@ export const Container = styled.div`
   @media (max-width: ${({ theme }) => theme.metrics.desktop_small}) {
     width: 52px;
   }
+
+  @media (max-width: ${({ theme }) => theme.metrics.tablet_small}) {
+    width: 100%;
+  }
 `;
 
 export const MenuItems = styled.nav`
@@ -25,6 +29,10 @@ export const MenuItems = styled.nav`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.metrics.gap};
+
+  @media (max-width: ${({ theme }) => theme.metrics.tablet_small}) {
+    flex-direction: row;
+  }
 `;
 
 export const MenuItem = styled(Link)`

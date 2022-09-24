@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from 'styled-components'
 
 export const Container = styled.div`
   flex: 1;
@@ -15,4 +15,12 @@ export const Container = styled.div`
   align-items: stretch;
   padding: ${({ theme }) => theme.metrics.padding};
   gap: ${({ theme }) => theme.metrics.gap};
-`;
+
+  @media (max-width: ${({ theme }) => theme.metrics.tablet_small}) {
+    grid-template-areas:
+      'header header'
+      'topbar topbar'
+      'pages pages'
+      'aside aside';
+  }
+`

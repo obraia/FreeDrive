@@ -8,4 +8,8 @@ export const Aside = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.metrics.gap};
+
+  @media (max-width: ${({ theme }) => theme.metrics.tablet_small}) {
+    flex-direction: row;
+  }
 `;

@@ -16,6 +16,11 @@ export const Container = styled.div`
   @media (max-width: ${({ theme }) => theme.metrics.desktop_small}) {
     width: 52px;
   }
+
+  @media (max-width: ${({ theme }) => theme.metrics.tablet_small}) {
+    height: auto;
+    justify-content: center;
+  }
 `
 
 export const Text = styled.p`
