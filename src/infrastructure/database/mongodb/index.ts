@@ -41,7 +41,7 @@ class MongoDB {
   }
 
   public createMongooseConnection() {
-    mongoose.connect(this._uri, { dbName: this._database })
+    mongoose.connect(this._uri, { dbName: this._database, ignoreUndefined: true })
     return mongoose
   }
 

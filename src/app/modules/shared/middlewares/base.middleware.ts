@@ -1,7 +1,7 @@
 import { boundClass } from 'autobind-decorator'
 import { Response, Request } from 'express'
-import { StatusException } from '../exceptions/status.exception'
-import { httpStatusCode } from '../helpers/httpStatus.helper'
+import { Error } from '../presentation/errors/dtos/error.dto'
+import { status } from '../helpers/status.helper'
 
 @boundClass
 class BaseMiddleware {
@@ -11,8 +11,8 @@ class BaseMiddleware {
     next()
   }
 
-  protected sendError(res: Response, error: StatusException) {
-    return res.status(error.status || httpStatusCode.INTERNAL_SERVER_ERROR).json({
+  protected sendError(res: Response, error: Error) {
+    return res.status(error.status || status.INTERNAL_SERVER_ERROR).json({
       message: error.message,
     })
   }

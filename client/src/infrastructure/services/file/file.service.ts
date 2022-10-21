@@ -46,7 +46,7 @@ const useFileService = () => {
   const downloadFiles = async (ids: string[]) => {
     const { data, headers } = await axios.get<IDownloadFileResponse>(
       `/files/download`,
-      { params: { ids }, responseType: 'blob' },
+      { params: { ids: ids.join(';') }, responseType: 'blob' },
     )
     return { data, originalName: headers['file-name'] }
   }

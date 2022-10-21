@@ -2,7 +2,7 @@ import React from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import _ from 'lodash';
-import { TbHelp, TbSettings } from 'react-icons/tb'
+import { TbSettings } from 'react-icons/tb'
 import { toggleTheme } from '../../../../../../infrastructure/redux/reducers/theme'
 import { RootState } from '../../../../../../infrastructure/redux/store'
 import { logout } from '../../../../../../infrastructure/redux/reducers/auth'
