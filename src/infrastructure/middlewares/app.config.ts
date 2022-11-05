@@ -3,6 +3,7 @@ import helmet from 'helmet'
 import cors from 'cors'
 import compression from 'compression'
 import path from 'path'
+import morganMiddleware from './morgan.middleware'
 import { Routes } from '../routes/routes.config'
 
 class AppConfig {
@@ -26,6 +27,8 @@ class AppConfig {
     this._app.use(express.json({ limit: '300mb' }))
     this._app.use(express.urlencoded({ limit: '300mb', extended: false }))
 
+    morganMiddleware(this._app)
+    
     this._app.use(
       cors({
         credentials: true,

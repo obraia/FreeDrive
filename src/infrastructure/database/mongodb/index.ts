@@ -1,5 +1,6 @@
 import { MongoClient } from 'mongodb'
 import mongoose from 'mongoose'
+import { logger } from '../../logger/logger.config'
 
 interface ICheckConnectionOptions {
   throwException?: boolean
@@ -11,30 +12,24 @@ class MongoDB {
   private _database: string
 
   constructor() {
-    this._uri = this._buildUri()
+    this._uri = process.env.DB_URL || this._buildUri()
     this._database = String(process.env.DB_NAME)
     this._client = new MongoClient(this._uri)
   }
 
-  public async checkConnection(options?: ICheckConnectionOptions): Promise<void> {
+  public async checkConnection(): Promise<void> {
     try {
       const cli = await this._client.connect()
       const db = cli.db(this._database)
       const result = await db.command({ ping: 1 })
 
       if (!result?.ok) {
-        console.error('[MongoDB] Connection database is not ok')
+        logger.error('[MongoDB] Connection database is not ok')
       }
 
       this.createMongooseConnection()
 
-      console.log('[MongoDB] Connected successfully')
-    } catch (err: any) {
-      console.error(`[MongoDB] ${err.message}`)
-
-      if (options?.throwException) {
-        throw new Error(err.message || err)
-      }
+      logger.info('[MongoDB] Connected successfully')
     } finally {
       this._client.close()
     }
@@ -46,10 +41,6 @@ class MongoDB {
   }
 
   private _buildUri(): string {
-    if (process.env.DB_URL) {
-      return process.env.DB_URL
-    }
-
     const {
       DB_HOST: host,
       DB_PORT: port,

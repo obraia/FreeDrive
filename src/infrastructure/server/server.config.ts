@@ -1,6 +1,7 @@
 import http from 'http'
 import { Application } from 'express'
 import { MongoDB } from '../database/mongodb'
+import { logger } from '../logger/logger.config'
 
 class ServerConfig {
   private port: number
@@ -13,16 +14,16 @@ class ServerConfig {
 
   start() {
     new MongoDB()
-      .checkConnection({ throwException: true })
+      .checkConnection()
       .then(() => {
         http.createServer(this.app).listen(this.port, () => {
-          console.log(
+          logger.info(
             `[Server] Running on port ${this.port} with ${this.env} enviroment`,
           )
         })
       })
       .catch((err) => {
-        console.error(err)
+        logger.error(`[MongoDB] ${err.message}`)
         process.exit(1)
       })
   }
