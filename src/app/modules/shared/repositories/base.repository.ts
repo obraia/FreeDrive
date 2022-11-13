@@ -1,39 +1,64 @@
 import { FilterQuery, Model, UpdateQuery } from 'mongoose'
 
-class BaseRepository<T> {
-  [x: string]: any
+interface IOptions {
+  pagination?: { page: number; limit: number }
+  populate?: string[]
+  projection?: string[]
+}
 
+class BaseRepository<T> {
   constructor(protected model: Model<T>) {}
 
-  createDocument(data: T | T[]) {
+  createDocument(data: Partial<T> | Partial<T>[]) {
     return new this.model(data)
   }
 
-  findOne(params: FilterQuery<T>, projection?: string) {
-    return this.model.findOne(params, projection).exec()
-  }
+  find(filter: FilterQuery<T>, options?: IOptions) {
+    const result = this.model.find(filter)
 
-  find(params: FilterQuery<T>, limit: number, page: number) {
-    return this.model
-      .find(params)
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .exec()
-  }
-
-  findAll(params: FilterQuery<T>) {
-    return this.model.find(params).exec()
-  }
-
-  findById(id: string, options: { populate?: string[]; projection?: string[] }) {
-    const result = this.model.findById(id)
-
-    if (options.populate) {
-      return result.populate(options.populate)
+    if (options?.pagination) {
+      result
+        .limit(options.pagination.limit)
+        .skip((options.pagination.page - 1) * options.pagination.limit)
     }
 
-    if (options.projection) {
-      return result.select(options.projection)
+    if (options?.populate) {
+      result.populate(options.populate)
+    }
+
+    if (options?.projection) {
+      result.select(options.projection)
+    }
+
+    return {
+      data: result.exec(),
+      total: this.model.countDocuments(filter).exec(),
+    }
+  }
+
+  findOne(params: FilterQuery<T>, options?: IOptions) {
+    const result = this.model.findOne(params)
+
+    if (options?.populate) {
+      result.populate(options.populate)
+    }
+
+    if (options?.projection) {
+      result.select(options.projection)
+    }
+
+    return result.exec()
+  }
+
+  findById(id: string, options?: IOptions) {
+    const result = this.model.findById(id)
+
+    if (options?.populate) {
+      result.populate(options.populate)
+    }
+
+    if (options?.projection) {
+      result.select(options.projection)
     }
 
     return result.exec()
@@ -43,11 +68,15 @@ class BaseRepository<T> {
     return this.model.create(data)
   }
 
-  update(id: string, data: UpdateQuery<T>) {
+  updateById(id: string, data: UpdateQuery<T>) {
     return this.model.findByIdAndUpdate(id, data, { new: true }).exec()
   }
 
-  delete(id: string) {
+  updateMany(params: FilterQuery<T>, data: UpdateQuery<T>) {
+    return this.model.updateMany(params, data)
+  }
+
+  deleteById(id: string) {
     return this.model.findByIdAndDelete(id).exec()
   }
 

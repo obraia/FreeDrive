@@ -377,4 +377,4 @@ const httpStatusCode = {
   NETWORK_AUTHENTICATION_REQUIRED: 511,
 };
 
-export { httpStatusCode };
+export default httpStatusCode;

@@ -27,7 +27,7 @@ const useFolderService = () => {
   }
 
   const getFolderById = async (id: string, params?: IGetFoldersParams) => {
-    const { data } = await axios.get<IGetFolderByIdResponse>(`/folders/deep/${id}`, {
+    const { data } = await axios.get<IGetFolderByIdResponse>(`/folders/parents/${id}`, {
       params,
     })
     return data

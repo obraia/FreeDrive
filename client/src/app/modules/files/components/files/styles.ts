@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { lighten, transparentize } from 'polished';
 import { Button } from '../../../shared/components/button/styles';
 
 export const Container = styled.section`
